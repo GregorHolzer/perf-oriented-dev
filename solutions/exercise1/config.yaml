@@ -1,0 +1,14 @@
+programs:
+  delannoy:
+    path: "../small_samples/build/delannoy"
+    args: 
+      - [13]
+      - [14]
+      - [15]
+repetitions: 3
+measurement_program: 
+  name: time
+  path: "/usr/bin/time"
+  args: ["-v"]
+output:
+  path: "./benchmark"
