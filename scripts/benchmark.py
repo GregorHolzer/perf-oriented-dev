@@ -91,7 +91,7 @@ def run_experiment(config: dict):
             for rep in range(1, repetitions + 1):
                 try:
                     result = subprocess.run(cmd, stdout=subprocess.PIPE,
-                                            stderr=subprocess.PIPE, text=True)
+                        stderr=subprocess.PIPE, universal_newlines=True)
                 except FileNotFoundError as exc:
                     sys.exit(f"ERROR: {exc}")
                 if result.returncode != 0:
