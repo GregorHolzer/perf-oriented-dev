@@ -1,14 +1,32 @@
 programs:
   delannoy:
-    path: "../small_samples/build/delannoy"
+    path: "../../small_samples/build/delannoy"
     args: 
       - [13]
       - [14]
       - [15]
-repetitions: 3
+  filegen:
+    path: "../../small_samples/build/filegen"
+    args:
+      - [10, 50, 10000, 100000]
+      - [100, 50, 10000, 100000]
+      - [100, 50, 100000, 1000000]
+      - [1000, 100, 1000, 1000]
+  filesearch:
+    path: "../../small_samples/build/filesearch" 
+  mmul:
+    path: "../../small_samples/build/mmul"
+  nbody:
+    path: "../../small_samples/build/nbody"
+  qap:
+    path: "../../small_samples/build/qap"
+    args: 
+      - [../../small_samples/qap/problems/chr10a.dat]
+      - [../../small_samples/qap/problems/chr15a.dat]      
+repetitions: 4
 measurement_program: 
-  name: time
   path: "/usr/bin/time"
-  args: ["-v"]
+  args: ["-v"] 
 output:
   path: "./benchmark"
+lcc3: False
