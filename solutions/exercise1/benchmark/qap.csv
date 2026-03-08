@@ -1,0 +1,9 @@
+args,rep,wall_clock_s,user_cpu_s,sys_cpu_s,max_rss_kb
+../../small_samples/qap/problems/chr10a.dat,1,0.0,0.0,0.0,1700
+../../small_samples/qap/problems/chr10a.dat,2,0.0,0.0,0.0,1700
+../../small_samples/qap/problems/chr10a.dat,3,0.0,0.0,0.0,1624
+../../small_samples/qap/problems/chr10a.dat,4,0.0,0.0,0.0,1700
+../../small_samples/qap/problems/chr15a.dat,1,1.78,1.77,0.0,1700
+../../small_samples/qap/problems/chr15a.dat,2,1.77,1.77,0.0,1736
+../../small_samples/qap/problems/chr15a.dat,3,1.75,1.74,0.0,1692
+../../small_samples/qap/problems/chr15a.dat,4,1.78,1.77,0.0,1696
