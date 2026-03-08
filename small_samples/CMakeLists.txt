@@ -21,3 +21,7 @@ add_executable(qap qap/qap.c)
 add_executable(filesearch filesearch/filesearch.c)
 
 add_executable(filegen filegen/filegen.c)
+
+target_compile_definitions(mmul PRIVATE S=2048)
+
+target_compile_definitions(nbody PRIVATE N=2000 M=200)

@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifndef S
 #define S 1000
+#endif
 #define N S
 #define M S
 #define K S
