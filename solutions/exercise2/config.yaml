@@ -1,0 +1,31 @@
+programs:
+  delannoy:
+    build_path: "../../small_samples/build"
+    args: 
+      - [14]
+  filegen:
+    build_path: "../../small_samples/build"
+    args:
+      - [2000, 200, 10, 1000]
+  filesearch:
+    build_path: "../../small_samples/build" 
+  mmul:
+    build_path: "../../small_samples/build"
+    defines:
+      - {S: 1024}
+  nbody:
+    build_path: "../../small_samples/build"
+    defines:
+      - {N: 1000, M: 200}
+  qap:
+    build_path: "../../small_samples/build"
+    args: 
+      - [../../small_samples/qap/problems/chr15b.dat]
+repetitions: 1
+converge: True
+measurement_program: 
+  path: "/usr/bin/time"
+  args: ["-v"] 
+output:
+  path: "./local_no_load"
+lcc3: False

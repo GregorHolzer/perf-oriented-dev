@@ -29,9 +29,9 @@ void load_load_profile(const char *filename, load_profile *prof) {
   skipline(in);
 
   // allocate memory for values
-  prof->values = (double **)calloc(sizeof(double *), prof->cores);
+  prof->values = (double **)calloc(prof->cores, sizeof(double *));
   for (ull core = 0; core < prof->cores; ++core) {
-    prof->values[core] = (double *)calloc(sizeof(double), prof->length);
+    prof->values[core] = (double *)calloc(prof->length, sizeof(double));
   }
 
   // read in values
@@ -84,6 +84,7 @@ int main(int argc, char **argv) {
 #pragma omp parallel
   {
     ull core = omp_get_thread_num();
+    //Pins thread to one core
     set_affinity(core);
 
     ull core_index = core % profile.cores;

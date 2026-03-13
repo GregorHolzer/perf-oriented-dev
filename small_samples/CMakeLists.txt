@@ -22,6 +22,16 @@ add_executable(filesearch filesearch/filesearch.c)
 
 add_executable(filegen filegen/filegen.c)
 
-target_compile_definitions(mmul PRIVATE S=2048)
+if(NOT DEFINED S)
+  set(S 1000)
+endif()
+if(NOT DEFINED N)
+  set(N 1000)
+endif()
+if(NOT DEFINED M)
+  set(M 100)
+endif()
 
-target_compile_definitions(nbody PRIVATE N=2000 M=200)
+target_compile_definitions(mmul PRIVATE S=${S})
+
+target_compile_definitions(nbody PRIVATE N=${N} M=${M})
