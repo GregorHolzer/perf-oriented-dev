@@ -1,0 +1,4 @@
+defines,args,rep,wall_clock_s,user_cpu_s,sys_cpu_s,max_rss_kb
+default,../../small_samples/qap/problems/chr10a.dat,0,0.0,0.0,0.0,1692
+default,../../small_samples/qap/problems/chr10a.dat,1,0.0,0.0,0.0,1752
+default,../../small_samples/qap/problems/chr10a.dat,2,0.0,0.0,0.0,1704
