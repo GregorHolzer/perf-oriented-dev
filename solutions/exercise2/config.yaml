@@ -1,31 +1,31 @@
 programs:
+  qap:
+    build_path: "~/perf-oriented-dev/small_samples/build"
+    args: 
+      - ["/home/gregor/perf-oriented-dev/small_samples/qap/problems/chr15b.dat"]
   delannoy:
-    build_path: "../../small_samples/build"
+    build_path: "~/perf-oriented-dev/small_samples/build"
     args: 
       - [14]
   filegen:
-    build_path: "../../small_samples/build"
+    build_path: "~/perf-oriented-dev/small_samples/build"
     args:
       - [2000, 200, 10, 1000]
   filesearch:
-    build_path: "../../small_samples/build" 
+    build_path: "~/perf-oriented-dev/small_samples/build" 
   mmul:
-    build_path: "../../small_samples/build"
+    build_path: "~/perf-oriented-dev/small_samples/build"
     defines:
       - {S: 1024}
   nbody:
-    build_path: "../../small_samples/build"
+    build_path: "~/perf-oriented-dev/small_samples/build"
     defines:
       - {N: 1000, M: 200}
-  qap:
-    build_path: "../../small_samples/build"
-    args: 
-      - [../../small_samples/qap/problems/chr15b.dat]
-repetitions: 1
+repetitions: 4
 converge: True
 measurement_program: 
   path: "/usr/bin/time"
   args: ["-v"] 
 output:
-  path: "./local_no_load"
+  path: "~/perf-oriented-dev/solutions/exercise2/local_no_load"
 lcc3: False

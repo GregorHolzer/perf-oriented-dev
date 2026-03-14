@@ -1,4 +1,0 @@
-defines,args,rep,wall_clock_s,user_cpu_s,sys_cpu_s,max_rss_kb
-default,,0,1.78,1.77,0.0,2040
-default,,1,1.78,1.77,0.0,2108
-default,,2,1.78,1.77,0.0,2176
