@@ -21,6 +21,7 @@ void set_affinity(int core) {
   cpu_set_t mask;
   CPU_ZERO(&mask);
   CPU_SET(core, &mask);
+  printf("Scheduled loadgen thread to core %d\n", core);
   if (pthread_setaffinity_np(pthread_self(), sizeof(mask), &mask) != 0) {
     printf("Error setting thread affinity.\n");
     exit(-1);

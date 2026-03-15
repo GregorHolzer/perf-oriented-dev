@@ -186,7 +186,7 @@ def run_experiment(config: dict):
 
     CV_THRESHOLD = 0.05
     MIN_MEAN = 0.01
-    MAX_REPS = 10
+    MAX_REPS = 15
 
     output_dir = Path(config.get("output", {}).get("path", "./benchmark")).expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,15 @@
+programs:
+  filegen:
+    build_path: "~/perf-oriented-dev/small_samples/build"
+    args:
+      - [2000, 200, 10, 1000]
+  filesearch:
+    build_path: "~/perf-oriented-dev/small_samples/build" 
+repetitions: 4
+converge: True
+measurement_program: 
+  path: "/usr/bin/time"
+  args: ["-v"] 
+output:
+  path: "~/perf-oriented-dev/solutions/exercise2/taskB/local/io_work_load"
+lcc3: False

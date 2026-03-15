@@ -5,6 +5,7 @@
 #include <time.h>
 #include <omp.h>
 #include <signal.h>
+#include <unistd.h>
 
 #define MAX_FILENAME_LENGTH 256
 
@@ -23,7 +24,7 @@ int random_number(int min, int max) {
     return min + rand() % (max - min + 1);
 }
 
-void create_files(const char* dirname, int num_files, int min_file_size, int max_file_size) {
+void create_files(const char* dirname, int num_files, int min_file_size, int max_file_size, int sleep_duration_ms) {
     char full_dirname[MAX_FILENAME_LENGTH];
     snprintf(full_dirname, MAX_FILENAME_LENGTH, "generated/%s", dirname);
     mkdir(full_dirname, 0755); // Create the directory
@@ -53,6 +54,7 @@ void create_files(const char* dirname, int num_files, int min_file_size, int max
         }
         remove(filename);
     }
+    usleep(sleep_duration_ms * 1000);
 }
 
 void handler(int param) {
@@ -63,7 +65,7 @@ void handler(int param) {
 int main(int argc, char** argv) {
     signal(SIGINT, handler);
     signal(SIGTERM, handler);
-    int num_directories, num_files, min_file_size, max_file_size, seed, number_of_threads;
+    int num_directories, num_files, min_file_size, max_file_size, seed, number_of_threads, sleep_duration_ms;
 
     // Set default values for the parameters
     num_directories = 1;
@@ -72,9 +74,12 @@ int main(int argc, char** argv) {
     max_file_size = 1048576;
     seed = 1234; // Set default seed to 1234
     number_of_threads = 1;
+    sleep_duration_ms = 0;
 
     // Parse command line arguments
     switch (argc) {
+        case 8:
+            sleep_duration_ms = atoi(argv[7]);
         case 7:
             number_of_threads = atoi(argv[6]);
         case 6:
@@ -101,7 +106,7 @@ int main(int argc, char** argv) {
             for (int j = 0; j < num_directories; j++) {
                 char dirname[MAX_FILENAME_LENGTH];
                 snprintf(dirname, MAX_FILENAME_LENGTH, "dir_thread_%d_%d",i, j);
-                create_files(dirname, num_files, min_file_size, max_file_size);
+                create_files(dirname, num_files, min_file_size, max_file_size, sleep_duration_ms);
             }
         }
     }
