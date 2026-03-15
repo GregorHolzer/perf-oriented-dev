@@ -1,0 +1,15 @@
+programs:
+  filegen:
+    build_path: "/scratch/cb761230/perf-oriented-dev/small_samples/build"
+    args:
+      - [10, 100, 1, 10]
+  filesearch:
+    build_path: "/scratch/cb761230/perf-oriented-dev/small_samples/build"
+repetitions: 3
+converge: True
+measurement_program: 
+  path: "/usr/bin/time"
+  args: ["-v"] 
+output:
+  path: "/scratch/cb761230/perf-oriented-dev/solutions/exercise2/taskB/lcc3/io_work_load"
+lcc3: False

@@ -1,0 +1,31 @@
+programs:
+  qap:
+    build_path: "/scratch/cb761230/perf-oriented-dev/small_samples/build"
+    args: 
+      - ["/scratch/cb761230/perf-oriented-dev/small_samples/qap/problems/chr10a.dat"]
+  delannoy:
+    build_path: "/scratch/cb761230/perf-oriented-dev/small_samples/build"
+    args: 
+      - [12]
+  filegen:
+    build_path: "/scratch/cb761230/perf-oriented-dev/small_samples/build"
+    args:
+      - [10, 100, 1, 10]
+  filesearch:
+    build_path: "/scratch/cb761230/perf-oriented-dev/small_samples/build" 
+  mmul:
+    build_path: "/scratch/cb761230/perf-oriented-dev/small_samples/build"
+    defines:
+      - {S: 512}
+  nbody:
+    build_path: "/scratch/cb761230/perf-oriented-dev/small_samples/build"
+    defines:
+      - {N: 1000, M: 200}
+repetitions: 3
+converge: True
+measurement_program: 
+  path: "/usr/bin/time"
+  args: ["-v"] 
+output:
+  path: "/scratch/cb761230/perf-oriented-dev/solutions/exercise2/taskA/lcc3/external_load"
+lcc3: False

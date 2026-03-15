@@ -1,0 +1,9 @@
+defines,args,rep,wall_clock_s,user_cpu_s,sys_cpu_s,max_rss_kb
+default,/scratch/cb761230/perf-oriented-dev/small_samples/qap/problems/chr10a.dat,0,0.03,0.01,0.0,1564
+default,/scratch/cb761230/perf-oriented-dev/small_samples/qap/problems/chr10a.dat,1,0.88,0.0,0.0,1536
+default,/scratch/cb761230/perf-oriented-dev/small_samples/qap/problems/chr10a.dat,2,0.02,0.01,0.0,1516
+default,/scratch/cb761230/perf-oriented-dev/small_samples/qap/problems/chr10a.dat,3,0.03,0.0,0.0,1492
+default,/scratch/cb761230/perf-oriented-dev/small_samples/qap/problems/chr10a.dat,4,0.03,0.01,0.0,1592
+default,/scratch/cb761230/perf-oriented-dev/small_samples/qap/problems/chr10a.dat,5,0.02,0.01,0.0,1596
+default,/scratch/cb761230/perf-oriented-dev/small_samples/qap/problems/chr10a.dat,6,0.03,0.01,0.0,1568
+default,/scratch/cb761230/perf-oriented-dev/small_samples/qap/problems/chr10a.dat,7,0.02,0.0,0.0,1496

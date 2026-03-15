@@ -1,0 +1,4 @@
+defines,args,rep,wall_clock_s,user_cpu_s,sys_cpu_s,max_rss_kb
+S=1024,,0,7.44,7.41,0.0,25636
+S=1024,,1,7.42,7.39,0.0,25596
+S=1024,,2,7.44,7.41,0.0,25580
