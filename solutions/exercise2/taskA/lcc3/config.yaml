@@ -27,5 +27,5 @@ measurement_program:
   path: "/usr/bin/time"
   args: ["-v"] 
 output:
-  path: "/scratch/cb761230/perf-oriented-dev/solutions/exercise2/taskA/lcc3/external_load"
+  path: "/scratch/cb761230/perf-oriented-dev/solutions/exercise2/taskA/lcc3/no_external_load"
 lcc3: False
