@@ -71,7 +71,7 @@ def build_program(prog_name, prog_cfg, definitions: dict):
         exit(-1)
 
 
-def get_unconverged_combos(rows: list, cv_threshold: float = 0.05, min_mean: float = 0.01) -> set:
+def get_unconverged_combos(rows: list, cv_threshold: float = 0.05) -> set:
     """Returns set of (defines, args) combos that haven't converged yet."""
     if not rows:
         return None  # no data yet, run everything
@@ -85,23 +85,21 @@ def get_unconverged_combos(rows: list, cv_threshold: float = 0.05, min_mean: flo
             continue
         for key in metric_keys:
             vals = [r[key] for r in combo_rows]
-            mean, _, cv = compute_stats(vals)
-            if abs(mean) < min_mean:
-                continue
+            _, _, cv = compute_stats(vals)
             if cv >= cv_threshold:
                 unconverged.add((defines_str, args_str))
                 break
     return unconverged
 
 
-def check_converged(results: dict[str, list], cv_threshold: float = 0.05, min_mean: float = 0.01) -> dict[str, bool]:
+def check_converged(results: dict[str, list], cv_threshold: float = 0.05) -> dict[str, bool]:
     """Returns per-program convergence status, checked per (defines, args) combo."""
     converged = {}
     for prog_name, rows in results.items():
         if not rows:
             converged[prog_name] = False
             continue
-        unconverged = get_unconverged_combos(rows, cv_threshold, min_mean)
+        unconverged = get_unconverged_combos(rows, cv_threshold)
         converged[prog_name] = len(unconverged) == 0
     return converged
 
@@ -122,12 +120,13 @@ def run_once(prog_name, prog_cfg, meas_path, meas_args, lcc3, rep, results, skip
             args_str = " ".join(args)
 
             if skip_combos is not None and (defines_str, args_str) not in skip_combos:
-                continue  # already converged, skip
+                continue  
 
             base_cmd = [str(prog_path)] + args
-            if lcc3:
-                base_cmd = ["srun", str(prog_path)] + args
             cmd = ([meas_path] + meas_args + base_cmd) if meas_path else base_cmd
+            if lcc3:
+                cmd = ["srun"] + cmd
+            
 
             print(f"  [{prog_name}|{defines_str}] rep={rep} cmd: {' '.join(cmd)}")
             try:
@@ -185,13 +184,11 @@ def run_experiment(config: dict):
     meas_args = meas_cfg.get("args", [])
 
     CV_THRESHOLD = 0.05
-    MIN_MEAN = 0.01
-    MAX_REPS = 8
+    MAX_REPS = 20
 
     output_dir = Path(config.get("output", {}).get("path", "./benchmark")).expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # build all programs first, one dir per define combo
     for prog_name, prog_cfg in programs.items():
         raw_defines = prog_cfg.get("defines", [{}])
         define_list = [entry if isinstance(entry, dict) else {} for entry in raw_defines]
@@ -200,30 +197,28 @@ def run_experiment(config: dict):
 
     results: dict[str, list] = {}
 
-    # fixed repetitions interleaved across all programs
     for rep in range(repetitions):
         print(f"\n--- Rep {rep + 1}/{repetitions} ---")
         for prog_name, prog_cfg in programs.items():
             run_once(prog_name, prog_cfg, meas_path, meas_args, lcc3, rep, results)
 
-    # convergence phase
     if converge:
         print("\n--- Convergence phase ---")
         rep = repetitions
         while rep < MAX_REPS:
-            converged = check_converged(results, CV_THRESHOLD, MIN_MEAN)
+            converged = check_converged(results, CV_THRESHOLD)
             if all(converged.values()):
                 print(f"All programs converged after {rep} reps total")
                 break
             for prog_name, prog_cfg in programs.items():
                 if converged.get(prog_name, False):
                     continue
-                unconverged = get_unconverged_combos(results.get(prog_name, []), CV_THRESHOLD, MIN_MEAN)
+                unconverged = get_unconverged_combos(results.get(prog_name, []), CV_THRESHOLD)
                 run_once(prog_name, prog_cfg, meas_path, meas_args, lcc3, rep, results, skip_combos=unconverged)
             rep += 1
         else:
             print(f"Hit max reps ({MAX_REPS}) without full convergence")
-            for prog_name, converged_status in check_converged(results, CV_THRESHOLD, MIN_MEAN).items():
+            for prog_name, converged_status in check_converged(results, CV_THRESHOLD).items():
                 print(f"  {prog_name}: {'converged' if converged_status else 'NOT converged'}")
 
     write_results(results, output_dir)

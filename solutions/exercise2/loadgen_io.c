@@ -62,6 +62,11 @@ void handler(int param) {
   run = 0;
 }
 
+/* 
+Works like the filegen.c benchmark script but takes a number of threads that execute the creation of files until program is stopped by signal
+After creating and deleting all files of a directory, the thread sleeps a configurable time.
+*/
+
 int main(int argc, char** argv) {
     signal(SIGINT, handler);
     signal(SIGTERM, handler);

@@ -6,21 +6,21 @@ programs:
   delannoy:
     build_path: "~/perf-oriented-dev/small_samples/build"
     args: 
-      - [14]
+      - [12]
   filegen:
     build_path: "~/perf-oriented-dev/small_samples/build"
     args:
-      - [2000, 200, 10, 1000]
+      - [200, 200, 10, 1000]
   filesearch:
     build_path: "~/perf-oriented-dev/small_samples/build" 
   mmul:
     build_path: "~/perf-oriented-dev/small_samples/build"
     defines:
-      - {S: 1024}
+      - {S: 512}
   nbody:
     build_path: "~/perf-oriented-dev/small_samples/build"
     defines:
-      - {N: 1000, M: 200}
+      - {N: 100, M: 200}
 repetitions: 4
 converge: True
 measurement_program: 
