@@ -1,11 +1,11 @@
 programs:
   npb_bt_a:
     build_path: "~/perf-oriented-dev/larger_samples/npb_bt/build"
-repetitions: 5
+repetitions: 1
 converge: False
 measurement_program: 
   path: "/usr/bin/time"
   args: ["-v"] 
 output:
-  path: "~/perf-oriented-dev/solutions/exercise3/taskB/with_tracy.csv"
+  path: "~/perf-oriented-dev/solutions/exercise3/taskB/gprof"
 lcc3: False

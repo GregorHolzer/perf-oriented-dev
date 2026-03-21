@@ -32,7 +32,7 @@
 //          and Jaejin Lee                                                 //
 //-------------------------------------------------------------------------//
 
-#include "tracy/TracyC.h"
+//#include "tracy/TracyC.h"
 #include "header.h"
 #include "work_lhs.h"
 #include "timers.h"
@@ -48,7 +48,7 @@
 //---------------------------------------------------------------------
 void z_solve()
 {
-  TracyCZone(ctx, 1)
+  //TracyCZone(ctx, 1)
   int i, j, k, m, n, ksize;
 
   //---------------------------------------------------------------------
@@ -407,5 +407,5 @@ void z_solve()
     }
   }
   if (timeron) timer_stop(t_zsolve);
-  TracyCZoneEnd(ctx)
+  //TracyCZoneEnd(ctx)
 }
