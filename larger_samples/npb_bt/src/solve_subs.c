@@ -27,6 +27,8 @@
 //                                                                         //
 //-------------------------------------------------------------------------//
 
+#include "tracy/TracyC.h"
+
 //-------------------------------------------------------------------------//
 // Authors: Sangmin Seo, Jungwon Kim, Jun Lee, Jeongho Nah, Gangwon Jo,    //
 //          and Jaejin Lee                                                 //
@@ -74,6 +76,7 @@ void matvec_sub(double ablock[5][5], double avec[5], double bvec[5])
 //---------------------------------------------------------------------
 void matmul_sub(double ablock[5][5], double bblock[5][5], double cblock[5][5])
 {
+  TracyCZone(ctx, 1)
   cblock[0][0] = cblock[0][0] - ablock[0][0]*bblock[0][0]
                               - ablock[1][0]*bblock[0][1]
                               - ablock[2][0]*bblock[0][2]
@@ -199,11 +202,13 @@ void matmul_sub(double ablock[5][5], double bblock[5][5], double cblock[5][5])
                               - ablock[2][4]*bblock[4][2]
                               - ablock[3][4]*bblock[4][3]
                               - ablock[4][4]*bblock[4][4];
+  TracyCZoneEnd(ctx)                              
 }
 
 
 void binvcrhs(double lhs[5][5], double c[5][5], double r[5])
 {
+  TracyCZone(ctx, 1)
   double pivot, coeff;
 
   pivot = 1.00/lhs[0][0];
@@ -459,6 +464,7 @@ void binvcrhs(double lhs[5][5], double c[5][5], double r[5])
   c[3][3] = c[3][3] - coeff*c[3][4];
   c[4][3] = c[4][3] - coeff*c[4][4];
   r[3]   = r[3]   - coeff*r[4];
+  TracyCZoneEnd(ctx)
 }
 
 
