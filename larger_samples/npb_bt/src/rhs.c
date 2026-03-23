@@ -32,13 +32,13 @@
 //          and Jaejin Lee                                                 //
 //-------------------------------------------------------------------------//
 
-//#include "tracy/TracyC.h"
+#include "tracy/TracyC.h"
 #include "header.h"
 #include "timers.h"
 
 void compute_rhs()
 {
-  //TracyCZone(ctx, 1)
+  TracyCZone(ctx, 1)
   int i, j, k, m;
   double rho_inv, uijk, up1, um1, vijk, vp1, vm1, wijk, wp1, wm1;
 
@@ -442,5 +442,5 @@ void compute_rhs()
   }
   } //end parallel
   if (timeron) timer_stop(t_rhs);
-  //TracyCZoneEnd(ctx);
+  TracyCZoneEnd(ctx);
 }

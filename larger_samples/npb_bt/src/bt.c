@@ -42,7 +42,7 @@
 #include <omp.h>
 #endif
 
-//#include "tracy/TracyC.h"
+#include "tracy/TracyC.h"
 #include "header.h"
 #include "timers.h"
 #include "print_results.h"
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
     }
 
     adi();
-    //TracyCFrameMark
+    TracyCFrameMark
   }
 
   timer_stop(1);
