@@ -1,0 +1,13 @@
+programs:
+  ssca2:
+    build_path: "~/perf-oriented-dev/larger_samples/ssca2/build"
+    args: [["10"]]
+repetitions: 10
+converge: True
+measurement_program: 
+  path: "/usr/bin/time"
+  args: ["-v"] 
+output:
+  path: "~/perf-oriented-dev/solutions/exercise4/taskA/ssca/normal"
+lcc3: False
+massif: False

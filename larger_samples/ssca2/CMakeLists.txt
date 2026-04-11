@@ -6,6 +6,8 @@ set_property(GLOBAL PROPERTY C_STANDARD 11)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.c src/*.h src/sprng2.0/*.c src/sprng2.0/*.h)
 include_directories(src/sprng2.0/include)
 
+add_compile_options(-g)
+
 link_libraries(m)
 add_definitions(-DLittleEndian, -DAdd__)
 

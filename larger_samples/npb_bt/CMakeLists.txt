@@ -8,11 +8,16 @@ else()
     add_compile_options(-Wall -Wextra -Wno-unknown-pragmas -Wno-unused-parameter)
 endif()
 
+# gprof
 #add_compile_options(-pg)
 #add_link_options(-pg)
 
-option(TRACY_ENABLE "" ON)
-add_subdirectory(${CMAKE_SOURCE_DIR}/../../third_party/tracy tracy)
+# tracy
+#option(TRACY_ENABLE "" ON)
+#add_subdirectory(${CMAKE_SOURCE_DIR}/../../third_party/tracy tracy)
+
+# massif
+#add_compile_options(-g)
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.c src/*.h)
 
@@ -20,20 +25,20 @@ link_libraries(m)
 
 add_executable(npb_bt_w ${SOURCE_FILES})
 target_include_directories(npb_bt_w PRIVATE src/w)
-target_link_libraries(npb_bt_w PUBLIC Tracy::TracyClient)
+#target_link_libraries(npb_bt_w PUBLIC Tracy::TracyClient)
 
 add_executable(npb_bt_s ${SOURCE_FILES})
 target_include_directories(npb_bt_s PRIVATE src/s)
-target_link_libraries(npb_bt_s PUBLIC Tracy::TracyClient)
+#target_link_libraries(npb_bt_s PUBLIC Tracy::TracyClient)
 
 add_executable(npb_bt_a ${SOURCE_FILES})
 target_include_directories(npb_bt_a PRIVATE src/a)
-target_link_libraries(npb_bt_a PUBLIC Tracy::TracyClient)
+#target_link_libraries(npb_bt_a PUBLIC Tracy::TracyClient)
 
 add_executable(npb_bt_b ${SOURCE_FILES})
 target_include_directories(npb_bt_b PRIVATE src/b)
-target_link_libraries(npb_bt_b PUBLIC Tracy::TracyClient)
+#target_link_libraries(npb_bt_b PUBLIC Tracy::TracyClient)
 
 add_executable(npb_bt_c ${SOURCE_FILES})
 target_include_directories(npb_bt_c PRIVATE src/c)
-target_link_libraries(npb_bt_c PUBLIC Tracy::TracyClient)
+#target_link_libraries(npb_bt_c PUBLIC Tracy::TracyClient)
