@@ -1,12 +1,12 @@
 programs:
   npb_bt_w:
-    build_path: "~/perf-oriented-dev/larger_samples/npb_bt/build"
+    build_path: "/scratch/cb761230/perf-oriented-dev/larger_samples/npb_bt/build"
 repetitions: 10
 converge: True
 measurement_program: 
   path: "/usr/bin/time"
   args: ["-v"] 
 output:
-  path: "~/perf-oriented-dev/solutions/exercise4/taskA/npb_bt/normal"
-lcc3: False
+  path: "/scratch/cb761230/perf-oriented-dev/solutions/exercise4/taskA/npb_bt/normal"
+lcc3: True
 massif: False

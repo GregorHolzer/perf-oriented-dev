@@ -1,0 +1,88 @@
+desc: --time-unit=ms
+cmd: ./npb_bt_w
+time_unit: ms
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=185
+mem_heap_B=488
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=189
+mem_heap_B=488
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=detailed
+n1: 488 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 488 0x524B20E: __fopen_internal (in /usr/lib64/libc-2.28.so)
+  n0: 488 0x400AC0: main (bt.c:112)
+#-----------
+snapshot=3
+#-----------
+time=189
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=190
+mem_heap_B=4096
+mem_heap_extra_B=8
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=192
+mem_heap_B=4584
+mem_heap_extra_B=24
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=192
+mem_heap_B=4584
+mem_heap_extra_B=24
+mem_stacks_B=0
+heap_tree=peak
+n2: 4584 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 4096 0x524A80F: _IO_file_doallocate (in /usr/lib64/libc-2.28.so)
+  n1: 4096 0x525885F: _IO_doallocbuf (in /usr/lib64/libc-2.28.so)
+   n1: 4096 0x5257AC7: _IO_file_overflow@@GLIBC_2.2.5 (in /usr/lib64/libc-2.28.so)
+    n1: 4096 0x5256C6E: _IO_file_xsputn@@GLIBC_2.2.5 (in /usr/lib64/libc-2.28.so)
+     n1: 4096 0x524CD32: puts (in /usr/lib64/libc-2.28.so)
+      n0: 4096 0x400B74: main (bt.c:133)
+ n2: 488 0x524B20E: __fopen_internal (in /usr/lib64/libc-2.28.so)
+  n0: 488 0x400B83: main (bt.c:135)
+  n0: 0 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=7
+#-----------
+time=192
+mem_heap_B=4096
+mem_heap_extra_B=8
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=54360
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty

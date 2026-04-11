@@ -185,7 +185,7 @@ def run_experiment(config: dict):
     converge = config.get("converge", False)
     meas_cfg = config.get("measurement_program", {})
     meas_path = meas_cfg.get("path", None)
-    massif = meas_cfg.get("massif", False)
+    massif = config.get("massif", False)
     meas_args = meas_cfg.get("args", [])
 
     CV_THRESHOLD = 0.05
