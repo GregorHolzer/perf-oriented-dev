@@ -1,0 +1,13 @@
+programs:
+  ssca2:
+    build_path: "/scratch/cb761230/perf-oriented-dev/larger_samples/ssca2/build"
+    args: [["17"]]
+repetitions: 10
+converge: True
+measurement_program: 
+  path: "/usr/bin/time"
+  args: ["-v"] 
+output:
+  path: "/scratch/cb761230/perf-oriented-dev/solutions/exercise4/taskA/ssca/massif"
+lcc3: True
+massif: True
