@@ -36,7 +36,7 @@ events = [
 
 MAX_CONCURRENT_EVENTS = 3
 PROGRAM_NAME = "ssca2"
-PROGRAM_RUN_CMD = ["ssca2",  "17"]
+PROGRAM_RUN_CMD = ["/scratch/cb761230/perf-oriented-dev/larger_samples/ssca2/build/ssca2", "17"]
 OUTPUT_CSV = f"counters_{PROGRAM_NAME}.csv"
 
 def parse_perf_output(stderr_text):
