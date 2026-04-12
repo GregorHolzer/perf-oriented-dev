@@ -34,9 +34,9 @@ events = [
     "node-stores",
 ]
 
-MAX_CONCURRENT_EVENTS = 3
-PROGRAM_NAME = "ssca2"
-PROGRAM_RUN_CMD = ["/scratch/cb761230/perf-oriented-dev/larger_samples/ssca2/build/ssca2", "17"]
+MAX_CONCURRENT_EVENTS = 4
+PROGRAM_NAME = "npb_bt"
+PROGRAM_RUN_CMD = ["/scratch/cb761230/perf-oriented-dev/larger_samples/npb_bt/build/npb_bt_w"]
 OUTPUT_CSV = f"counters_{PROGRAM_NAME}.csv"
 
 def parse_perf_output(stderr_text):
@@ -46,14 +46,39 @@ def parse_perf_output(stderr_text):
         line = line.strip()
         not_counted = re.match(r'<not counted>\s+(\S+)', line)
         if not_counted:
-            results[not_counted.group(1)] = None
+            results[not_counted.group(1).split(':')[0]] = None
             continue
         match = re.match(r'^([\d,]+)\s+(\S+)', line)
         if match:
             value = int(match.group(1).replace(',', ''))
-            event = match.group(2)
+            event = match.group(2).split(':')[0]  # strip :u or :k suffix
             results[event] = value
     return results
+
+def compute_ratios(all_results):
+    def ratio(a, b):
+        va = all_results.get(a)
+        vb = all_results.get(b)
+        if va is None or vb is None or vb == 0:
+            return None
+        return va / vb
+
+    return {
+        "L1-dcache-load-miss-rate":     ratio("L1-dcache-load-misses",     "L1-dcache-loads"),
+        "L1-dcache-store-miss-rate":    ratio("L1-dcache-store-misses",    "L1-dcache-stores"),
+        "L1-dcache-prefetch-miss-rate": ratio("L1-dcache-prefetch-misses", "L1-dcache-prefetches"),
+        "L1-icache-load-miss-rate":     ratio("L1-icache-load-misses",     "L1-icache-loads"),
+        "LLC-load-miss-rate":           ratio("LLC-load-misses",            "LLC-loads"),
+        "LLC-store-miss-rate":          ratio("LLC-store-misses",           "LLC-stores"),
+        "LLC-prefetch-miss-rate":       ratio("LLC-prefetch-misses",        "LLC-prefetches"),
+        "dTLB-load-miss-rate":          ratio("dTLB-load-misses",           "dTLB-loads"),
+        "dTLB-store-miss-rate":         ratio("dTLB-store-misses",          "dTLB-stores"),
+        "iTLB-load-miss-rate":          ratio("iTLB-load-misses",           "iTLB-loads"),
+        "node-load-miss-rate":          ratio("node-load-misses",           "node-loads"),
+        "node-store-miss-rate":         ratio("node-store-misses",          "node-stores"),
+        "node-prefetch-miss-rate":      ratio("node-prefetch-misses",       "node-prefetches"),
+        "branch-miss-rate":             ratio("branch-load-misses",         "branch-loads"),
+    }
 
 all_results = {}
 
@@ -77,6 +102,24 @@ while list_idx < len(events):
 
     list_idx += MAX_CONCURRENT_EVENTS
 
+ratios = compute_ratios(all_results)
+
+# Write ratios CSV
+ratios_csv = f"ratios_{PROGRAM_NAME}.csv"
+with open(ratios_csv, "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["metric", "value"])
+    for metric, value in ratios.items():
+        writer.writerow([metric, f"{value:.6f}" if value is not None else "n/a"])
+
+# Print ratios table
+print(f"\n{'Metric':<35} {'Rate':>10}")
+print("-" * 47)
+for metric, value in ratios.items():
+    val_str = f"{value*100:.2f}%" if value is not None else "n/a"
+    print(f"{metric:<35} {val_str:>10}")
+
+# Write raw counters CSV
 with open(OUTPUT_CSV, "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow(["event", "value"])
