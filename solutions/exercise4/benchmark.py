@@ -104,7 +104,7 @@ def check_converged(results: dict[str, list], cv_threshold: float = 0.05) -> dic
     return converged
 
 
-def run_once(prog_name, prog_cfg, meas_path, meas_args, lcc3, massif, rep, results, skip_combos=None):
+def run_once(prog_name, prog_cfg, meas_path, meas_args, prefix, lcc3, massif, rep, results, skip_combos=None):
     """Run all define/arg combos for one program once, appending rows to results."""
     raw_defines = prog_cfg.get("defines", [{}])
     raw_args = prog_cfg.get("args", [[]])
@@ -187,6 +187,7 @@ def run_experiment(config: dict):
     meas_path = meas_cfg.get("path", None)
     massif = config.get("massif", False)
     meas_args = meas_cfg.get("args", [])
+    prefix = meas_cfg.get("prefix", [])
 
     CV_THRESHOLD = 0.05
     MAX_REPS = 20
@@ -205,7 +206,7 @@ def run_experiment(config: dict):
     for rep in range(repetitions):
         print(f"\n--- Rep {rep + 1}/{repetitions} ---")
         for prog_name, prog_cfg in programs.items():
-            run_once(prog_name, prog_cfg, meas_path, meas_args, lcc3, massif, rep, results)
+            run_once(prog_name, prog_cfg, meas_path, meas_args, prefix, lcc3, massif, rep, results)
 
     if converge:
         print("\n--- Convergence phase ---")
@@ -219,7 +220,7 @@ def run_experiment(config: dict):
                 if converged.get(prog_name, False):
                     continue
                 unconverged = get_unconverged_combos(results.get(prog_name, []), CV_THRESHOLD)
-                run_once(prog_name, prog_cfg, meas_path, meas_args, lcc3, massif, rep, results, skip_combos=unconverged)
+                run_once(prog_name, prog_cfg, meas_path, meas_args, prefix, lcc3, massif, rep, results, skip_combos=unconverged)
             rep += 1
         else:
             print(f"Hit max reps ({MAX_REPS}) without full convergence")

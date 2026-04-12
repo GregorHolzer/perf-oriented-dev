@@ -1,0 +1,14 @@
+programs:
+  ssca2:
+    build_path: "/scratch/cb761230/perf-oriented-dev/larger_samples/npb_bt/build"
+    args: [["17"]]
+    prefix: ["perf", "stat", "-e", "L1-dcache-load-misses,L1-dcache-loads,L1-dcache-prefetch-misses,L1-dcache-prefetches"]
+repetitions: 10
+converge: True
+measurement_program: 
+  path: "/usr/bin/time"
+  args: ["-v"] 
+output:
+  path: "/scratch/cb761230/perf-oriented-dev/solutions/exercise4/taskB/ssca2/"
+lcc3: True
+massif: False
