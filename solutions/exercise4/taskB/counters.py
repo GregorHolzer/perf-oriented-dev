@@ -40,7 +40,6 @@ PROGRAM_RUN_CMD = ["/scratch/cb761230/perf-oriented-dev/larger_samples/npb_bt/bu
 OUTPUT_CSV = f"counters_{PROGRAM_NAME}.csv"
 
 def parse_perf_output(stderr_text):
-    """Parse perf stat stderr output into {event: value} dict."""
     results = {}
     for line in stderr_text.splitlines():
         line = line.strip()
@@ -104,22 +103,20 @@ while list_idx < len(events):
 
 ratios = compute_ratios(all_results)
 
-# Write ratios CSV
 ratios_csv = f"ratios_{PROGRAM_NAME}.csv"
+
 with open(ratios_csv, "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow(["metric", "value"])
     for metric, value in ratios.items():
         writer.writerow([metric, f"{value:.6f}" if value is not None else "n/a"])
 
-# Print ratios table
 print(f"\n{'Metric':<35} {'Rate':>10}")
 print("-" * 47)
 for metric, value in ratios.items():
     val_str = f"{value*100:.2f}%" if value is not None else "n/a"
     print(f"{metric:<35} {val_str:>10}")
 
-# Write raw counters CSV
 with open(OUTPUT_CSV, "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow(["event", "value"])

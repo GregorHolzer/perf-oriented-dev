@@ -12,4 +12,4 @@ iTLB-load-miss-rate,0.000002
 node-load-miss-rate,0.000006
 node-store-miss-rate,0.000000
 node-prefetch-miss-rate,0.000088
-branch-miss-rate,1.319966
+branch-load-miss-rate,1.319966
