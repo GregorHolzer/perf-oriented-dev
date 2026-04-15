@@ -1,0 +1,69 @@
+programs:
+  ssca2:
+    build_path: "/scratch/cb761230/perf-oriented-dev/larger_samples/ssca2/build"
+    args: 
+      - ["15"]
+    defines: 
+      - {CMAKE_C_FLAGS: "-O0"}
+      - {CMAKE_C_FLAGS: "-O1"}
+      - {CMAKE_C_FLAGS: "-O2"}
+      - {CMAKE_C_FLAGS: "-O3"}
+      - {CMAKE_C_FLAGS: "-Os"}
+      - {CMAKE_C_FLAGS: "-Ofast"}
+  npb_bt_w:
+    build_path: "/scratch/cb761230/perf-oriented-dev/larger_samples/npb_bt/build"
+    defines: 
+      - {CMAKE_C_FLAGS: "-O0"}
+      - {CMAKE_C_FLAGS: "-O1"}
+      - {CMAKE_C_FLAGS: "-O2"}
+      - {CMAKE_C_FLAGS: "-O3"}
+      - {CMAKE_C_FLAGS: "-Os"}
+      - {CMAKE_C_FLAGS: "-Ofast"}
+  mmul:
+    build_path: "/scratch/cb761230/perf-oriented-dev/small_samples/build"
+    defines: 
+      - {CMAKE_C_FLAGS: "-O0", S: 1000}
+      - {CMAKE_C_FLAGS: "-O1", S: 1000}
+      - {CMAKE_C_FLAGS: "-O2", S: 1000}
+      - {CMAKE_C_FLAGS: "-O3", S: 1000}
+      - {CMAKE_C_FLAGS: "-Os", S: 1000}
+      - {CMAKE_C_FLAGS: "-Ofast", S: 1000}
+  nbody: 
+    build_path: "/scratch/cb761230/perf-oriented-dev/small_samples/build"
+    defines: 
+      - {CMAKE_C_FLAGS: "-O0", M: 400}
+      - {CMAKE_C_FLAGS: "-O2", M: 400}
+      - {CMAKE_C_FLAGS: "-O1", M: 400}
+      - {CMAKE_C_FLAGS: "-O3", M: 400}
+      - {CMAKE_C_FLAGS: "-Os", M: 400}
+      - {CMAKE_C_FLAGS: "-Ofast", S: 400}
+  qap:
+    build_path: "/scratch/cb761230/perf-oriented-dev/small_samples/build"
+    args: 
+      - ["/scratch/cb761230/perf-oriented-dev/small_samples/qap/problems/chr15c.dat"]
+    defines: 
+      - {CMAKE_C_FLAGS: "-O0"}
+      - {CMAKE_C_FLAGS: "-O1"}
+      - {CMAKE_C_FLAGS: "-O2"}
+      - {CMAKE_C_FLAGS: "-O3"}
+      - {CMAKE_C_FLAGS: "-Os"}
+      - {CMAKE_C_FLAGS: "-Ofast"}
+  delannoy:
+    build_path: "/scratch/cb761230/perf-oriented-dev/small_samples/build"
+    args: 
+      - [13]
+    defines: 
+      - {CMAKE_C_FLAGS: "-O0"}
+      - {CMAKE_C_FLAGS: "-O1"}
+      - {CMAKE_C_FLAGS: "-O2"}
+      - {CMAKE_C_FLAGS: "-O3"}
+      - {CMAKE_C_FLAGS: "-Os"}
+      - {CMAKE_C_FLAGS: "-Ofast"}
+repetitions: 10
+converge: True
+measurement_program: 
+  path: "/usr/bin/time"
+  args: ["-v"] 
+output:
+  path: "/scratch/cb761230/perf-oriented-dev/solutions/exercise5/taskA/"
+lcc3: True
