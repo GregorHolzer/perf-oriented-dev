@@ -1,0 +1,15 @@
+metric,value
+L1-dcache-load-miss-rate,0.090204
+L1-dcache-store-miss-rate,0.088567
+L1-dcache-prefetch-miss-rate,n/a
+L1-icache-load-miss-rate,0.000006
+LLC-load-miss-rate,0.101727
+LLC-store-miss-rate,0.020508
+LLC-prefetch-miss-rate,0.385741
+dTLB-load-miss-rate,0.014740
+dTLB-store-miss-rate,0.015265
+iTLB-load-miss-rate,0.000002
+node-load-miss-rate,0.000006
+node-store-miss-rate,0.000000
+node-prefetch-miss-rate,0.000088
+branch-load-miss-rate,1.319966
