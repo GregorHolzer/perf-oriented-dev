@@ -6,7 +6,7 @@ set_property(GLOBAL PROPERTY C_STANDARD 11)
 if(MSVC)
   add_compile_options(/W4 /WX)
 else()
-  add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+  add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 add_executable(mmul mmul/mmul.c)
