@@ -43,7 +43,6 @@ def compute_stats(values: list) -> tuple:
     return mean, variance, cv
 
 def defines_slug(definitions: dict) -> str:
-    """Filesystem-safe, Ninja-safe identifier for a definitions dict."""
     def sanitize(s: str) -> str:
         return (str(s).lstrip("-")
                 .replace("-", "_").replace("=", "_")
@@ -61,7 +60,6 @@ def get_build_path(prog_name: str, prog_cfg: dict, definitions: dict) -> Path:
 
 
 def format_gcc_flag(flag: str, val) -> str:
-    """Convert a (flag, value) diff entry into a GCC flag string."""
     if val in (None, "[enabled]"):
         return flag                 
     elif val == "[disabled]":
@@ -97,7 +95,6 @@ def build_program(prog_name: str, prog_cfg: dict, definitions: dict):
 def run_once(prog_name: str, prog_cfg: dict, meas_path, meas_args: list,
              lcc3: bool, massif: bool, rep: int, results: dict,
              definitions_override: dict = None, skip_combos: set = None):
-    """Run all (definitions, args) combos once, appending rows to results."""
     raw_args = prog_cfg.get("args", [[]])
     prefix   = prog_cfg.get("prefix", [])
 
