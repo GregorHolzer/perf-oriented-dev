@@ -9,11 +9,6 @@ from receive_option import get_diffs
 
 import yaml
 
-
-# ---------------------------------------------------------------------------
-# Parsing
-# ---------------------------------------------------------------------------
-
 def parse_time_output(stderr: str) -> dict:
     metrics = {}
     for pattern, key, cast in [
@@ -40,21 +35,12 @@ def parse_time_output(stderr: str) -> dict:
     return metrics
 
 
-# ---------------------------------------------------------------------------
-# Stats
-# ---------------------------------------------------------------------------
-
 def compute_stats(values: list) -> tuple:
     n = len(values)
     mean = sum(values) / n
     variance = sum((x - mean) ** 2 for x in values) / n
     cv = (variance ** 0.5) / abs(mean) if mean != 0 else 0.0
     return mean, variance, cv
-
-
-# ---------------------------------------------------------------------------
-# Build helpers
-# ---------------------------------------------------------------------------
 
 def defines_slug(definitions: dict) -> str:
     """Filesystem-safe, Ninja-safe identifier for a definitions dict."""
@@ -77,11 +63,11 @@ def get_build_path(prog_name: str, prog_cfg: dict, definitions: dict) -> Path:
 def format_gcc_flag(flag: str, val) -> str:
     """Convert a (flag, value) diff entry into a GCC flag string."""
     if val in (None, "[enabled]"):
-        return flag                  # e.g. -fgcse-after-reload
+        return flag                 
     elif val == "[disabled]":
         return ""
     else:
-        return f"{flag}{val}"        # e.g. -fvect-cost-model=dynamic
+        return f"{flag}{val}"        
 
 
 def build_program(prog_name: str, prog_cfg: dict, definitions: dict):
@@ -89,11 +75,9 @@ def build_program(prog_name: str, prog_cfg: dict, definitions: dict):
     build_path.mkdir(parents=True, exist_ok=True)
     source_path = Path(prog_cfg["build_path"]).expanduser().resolve().parent
 
-    # Split cmake vars (e.g. S=1000) from gcc flags (start with -)
     cmake_vars = {k: v for k, v in definitions.items() if not k.startswith("-")}
     gcc_flags  = {k: v for k, v in definitions.items() if k.startswith("-")}
 
-    # Pull out base CMAKE_C_FLAGS (e.g. -O2) and merge with diff flag
     base_cflags = cmake_vars.pop("CMAKE_C_FLAGS", "")
     extra_flags = " ".join(filter(None, (format_gcc_flag(f, v) for f, v in gcc_flags.items())))
     all_cflags  = " ".join(filter(None, [base_cflags, extra_flags]))
@@ -109,11 +93,6 @@ def build_program(prog_name: str, prog_cfg: dict, definitions: dict):
         subprocess.run(f"ninja {prog_name}", cwd=build_path, shell=True, check=True)
     except subprocess.CalledProcessError as e:
         sys.exit(f"Build failed for {prog_name}: {e}")
-
-
-# ---------------------------------------------------------------------------
-# Measurement
-# ---------------------------------------------------------------------------
 
 def run_once(prog_name: str, prog_cfg: dict, meas_path, meas_args: list,
              lcc3: bool, massif: bool, rep: int, results: dict,
@@ -168,10 +147,6 @@ def run_once(prog_name: str, prog_cfg: dict, meas_path, meas_args: list,
                 )
 
 
-# ---------------------------------------------------------------------------
-# Convergence
-# ---------------------------------------------------------------------------
-
 def get_unconverged_combos(rows: list, cv_threshold: float = 0.05) -> set | None:
     if not rows:
         return None
@@ -194,10 +169,6 @@ def check_converged(results: dict, cv_threshold: float = 0.05) -> dict:
         for prog, rows in results.items()
     }
 
-
-# ---------------------------------------------------------------------------
-# Output
-# ---------------------------------------------------------------------------
 
 def write_results(results: dict, output_dir: Path):
     for prog_name, rows in results.items():
@@ -226,11 +197,6 @@ def write_results(results: dict, output_dir: Path):
                 print(f"  {mean:>15.3f}  {cv:>8.4f}", end="")
             print()
 
-
-# ---------------------------------------------------------------------------
-# Experiment
-# ---------------------------------------------------------------------------
-
 def iter_flag_defines(programs: dict, diffs: list):
     """Yield (prog_name, prog_cfg, flag_define) for every program x diff combo."""
     for prog_name, prog_cfg in programs.items():
@@ -256,13 +222,11 @@ def run_experiment(config: dict):
 
     output_dir = Path(config.get("output", {}).get("path", "./benchmark")).expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-
-    # Build phase
+    
     print("\n=== Build phase ===")
     for prog_name, prog_cfg, flag_define in iter_flag_defines(programs, diffs):
         build_program(prog_name, prog_cfg, flag_define)
 
-    # Measurement phase
     results: dict[str, list] = {}
     print("\n=== Measurement phase ===")
     for rep in range(repetitions):
@@ -272,7 +236,6 @@ def run_experiment(config: dict):
                      lcc3, massif, rep, results,
                      definitions_override=flag_define)
 
-    # Convergence phase
     if converge:
         print("\n=== Convergence phase ===")
         rep = repetitions
@@ -297,10 +260,6 @@ def run_experiment(config: dict):
 
     write_results(results, output_dir)
 
-
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
 
 def main():
     parser = argparse.ArgumentParser()

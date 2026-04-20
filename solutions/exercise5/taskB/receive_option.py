@@ -17,7 +17,6 @@ def get_options(cmd: str) -> dict:
 
         value = None
         for token in reversed(parts[1:]):
-            # Accept [enabled]/[disabled] but skip enum option lists like [unlimited|dynamic|...]
             if not token.startswith("[") or token in ("[enabled]", "[disabled]"):
                 value = token
                 break
