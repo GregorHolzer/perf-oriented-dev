@@ -1,0 +1,20 @@
+programs:
+  mmul:
+    build_path: "./build"
+    defines:
+      - { T: 2 }   # Minimal tiling (basically overhead testing)
+      - { T: 4 }
+      - { T: 8 }
+      - { T: 16 }  # Standard starting point
+      - { T: 32 }  # Often hits the L1/L2 sweet spot
+      - { T: 64 }  # Good for larger L2/L3 caches
+      - { T: 128 } # Testing the limits of cache capacity
+      - { T: 2048}
+repetitions: 5
+converge: True
+measurement_program: 
+  path: "/usr/bin/time"
+  args: ["-v"] 
+output:
+  path: "./"
+lcc3: False

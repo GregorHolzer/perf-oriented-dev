@@ -8,16 +8,19 @@
 #define M S
 #define K S
 
+#ifndef T
+#define T 16
+#endif
+
 #define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
 #define MAX(X, Y) ((X) > (Y) ? (X) : (Y))
 
 #define TYPE double
 #define MATRIX TYPE **
 
-// A utility function
 MATRIX createMatrix(unsigned x, unsigned y)
 {
-	TYPE *data = malloc(x * y * sizeof(TYPE));
+	TYPE *data = calloc(x * y, sizeof(TYPE));
 
 	TYPE **index = malloc(x * sizeof(TYPE *));
 	index[0] = data;
@@ -62,17 +65,23 @@ int main(void)
 		}
 	}
 
-	// conduct multiplication
-	for (int i = 0; i < N; i++)
+	for (int m_tile = 0; m_tile < M; m_tile += T)
 	{
-		for (int j = 0; j < K; j++)
+		for (int n_tile = 0; n_tile < N; n_tile += T)
 		{
-			TYPE sum = 0;
-			for (int k = 0; k < M; k++)
+			for (int k_tile = 0; k_tile < K; k_tile += T)
 			{
-				sum += A[i][k] * B[k][j];
+				for (int m = m_tile; m < MIN(M, m_tile + T); ++m)
+				{
+					for (int n = n_tile; n < MIN(N, n_tile + T); ++n)
+					{
+						for (int k = k_tile; k < MIN(K, k_tile + T); ++k)
+						{
+							C[m][k] += A[m][n] * B[n][k];
+						}
+					}
+				}
 			}
-			C[i][j] = sum;
 		}
 	}
 
