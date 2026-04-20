@@ -15,19 +15,14 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
-# ---------------------------------------------------------------------------
-# Config
-# ---------------------------------------------------------------------------
-
-TASKB_DIR = Path(".")          # directory containing taskB CSVs
-TASKA_DIR = Path("../taskA")   # directory containing taskA CSVs (for baselines)
+TASKB_DIR = Path(".")         
+TASKA_DIR = Path("../taskA")  
 OUTPUT_DIR = Path(".")
 
 PROGRAMS = ["ssca2", "mmul", "nbody", "npb_bt_w", "qap", "delannoy"]
 
 METRIC = "wall_clock_s"
 
-# Friendly short flag names for x-axis labels
 FLAG_LABELS = {
     "CMAKE_C_FLAGS__O2_fgcse_after_reload__enabled":          "fgcse-after-reload",
     "CMAKE_C_FLAGS__O2_fipa_cp_clone__enabled":               "fipa-cp-clone",
@@ -45,10 +40,6 @@ FLAG_LABELS = {
     "CMAKE_C_FLAGS__O2_fversion_loops_for_strides__enabled":  "fversion-loops-for-strides",
 }
 
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 
 def read_csv(path: Path) -> list[dict]:
     if not path.exists():
@@ -72,7 +63,6 @@ def group_stdev(rows: list[dict], defines: str, metric: str) -> float:
 def match_flag_label(defines_str: str) -> str | None:
     """Match a defines slug to a FLAG_LABELS key by substring — handles extra defines like S=1000."""
     for key, label in FLAG_LABELS.items():
-        # Extract just the flag portion (everything after CMAKE_C_FLAGS__O2_)
         flag_part = key.replace("CMAKE_C_FLAGS__O2_", "")
         if flag_part in defines_str:
             return label
@@ -86,10 +76,6 @@ def get_baseline(taska_rows: list[dict], flag_name: str) -> float | None:
     return statistics.mean(vals) if vals else None
 
 
-# ---------------------------------------------------------------------------
-# Plot
-# ---------------------------------------------------------------------------
-
 def plot_program(prog: str) -> dict[str, float]:
     """Plot per-program bar chart. Returns {flag_label: pct_improvement_vs_o2}."""
     taskb_rows = read_csv(TASKB_DIR / f"{prog}.csv")
@@ -99,7 +85,6 @@ def plot_program(prog: str) -> dict[str, float]:
         print(f"  [skip] {prog}: no taskB data")
         return {}
 
-    # --- Baselines from taskA ---
     o2_baseline = None
     o3_baseline = None
     for defines_str in set(r["defines"] for r in taska_rows):
@@ -109,7 +94,6 @@ def plot_program(prog: str) -> dict[str, float]:
         if "O3" in ds and o3_baseline is None:
             o3_baseline = get_baseline(taska_rows, defines_str)
 
-    # --- Per-flag means from taskB ---
     all_defines = sorted(set(r["defines"] for r in taskb_rows))
 
     labels, means, stdevs = [], [], []
@@ -124,11 +108,9 @@ def plot_program(prog: str) -> dict[str, float]:
     if not valid:
         print(f"  [skip] {prog}: no valid flag data")
         return {}
-    # Sort slowest (highest time) on the left, fastest on the right
     valid.sort(key=lambda x: x[1], reverse=True)
     labels, means, stdevs = zip(*valid)
 
-    # --- Plot ---
     fig, ax = plt.subplots(figsize=(14, 5))
 
     x = np.arange(len(labels))
@@ -160,7 +142,6 @@ def plot_program(prog: str) -> dict[str, float]:
     plt.close()
     print(f"  Saved {out}")
 
-    # Return percentage improvement over O2 baseline (positive = faster)
     if not o2_baseline:
         return {}
     return {
@@ -169,9 +150,6 @@ def plot_program(prog: str) -> dict[str, float]:
     }
 
 
-# ---------------------------------------------------------------------------
-# Cross-program ranking
-# ---------------------------------------------------------------------------
 
 def print_top_flags(all_improvements: dict[str, dict[str, float]], top_n: int = 3):
     """
@@ -179,12 +157,10 @@ def print_top_flags(all_improvements: dict[str, dict[str, float]], top_n: int = 
     Ranks flags by mean percentage improvement across all programs.
     Positive = faster than O2, negative = slower.
     """
-    # Collect all flag labels seen
     all_flags = set()
     for prog_data in all_improvements.values():
         all_flags.update(prog_data.keys())
 
-    # Compute mean improvement per flag across programs that have data for it
     flag_scores: dict[str, list[float]] = defaultdict(list)
     for prog_data in all_improvements.values():
         for flag, pct in prog_data.items():
@@ -192,7 +168,7 @@ def print_top_flags(all_improvements: dict[str, dict[str, float]], top_n: int = 
 
     ranked = sorted(flag_scores.items(),
                     key=lambda x: statistics.mean(x[1]),
-                    reverse=True)  # highest improvement first
+                    reverse=True)
 
     print("\n" + "=" * 60)
     print(f"  TOP {top_n} FLAGS BY MEAN % IMPROVEMENT OVER -O2")
@@ -225,12 +201,7 @@ def print_top_flags(all_improvements: dict[str, dict[str, float]], top_n: int = 
         print()
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
-
 if __name__ == "__main__":
-    # Allow overriding directories via argv
     if len(sys.argv) >= 2:
         TASKB_DIR = Path(sys.argv[1])
     if len(sys.argv) >= 3:
