@@ -4,44 +4,63 @@
 
 ### #1 — `-fpeel-loops` (+0.452% mean improvement)
 
-Peels the first and last few iterations off a loop body, separating them from the main loop. This allows the compiler to eliminate redundant conditional checks (e.g. boundary or special-case checks) that only apply at the start or end of iteration, leaving the hot inner loop cleaner and more amenable to further optimization.
+Peels loops for which there is enough information that they do
+not roll much (from profile feedback or static analysis).  It
+also turns on complete loop peeling (i.e. complete removal of
+loops with small constant number of iterations).
 
-| Program   | Improvement |
-|-----------|-------------|
-| npb_bt_w  | +4.527%     |
-| qap       | +0.043%     |
-| ssca2     | −0.142%     |
-| nbody     | −0.153%     |
-| delannoy  | −0.155%     |
-| mmul      | −1.406%     |
+Enabled by -O3, -fprofile-use, and -fauto-profile.
+
+| Program  | Improvement |
+| -------- | ----------- |
+| npb_bt_w | +4.527%     |
+| qap      | +0.043%     |
+| ssca2    | −0.142%     |
+| nbody    | −0.153%     |
+| delannoy | −0.155%     |
+| mmul     | −1.406%     |
 ---
 
 ### #2 — `-floop-unroll-and-jam` (+0.093% mean improvement)
 
-Unrolls outer loops and "jams" (fuses) the resulting copies of the inner loop together. This increases instruction-level parallelism and improves register reuse across iterations, particularly benefiting loops with independent iterations that the CPU can execute out-of-order.
+Apply unroll and jam transformations on feasible loops.  In a
+loop nest this unrolls the outer loop by some factor and fuses
+the resulting multiple inner loops.  This flag is enabled by
+default at -O3.  
 
-| Program   | Improvement |
-|-----------|-------------|
-| npb_bt_w  | +0.823%     |
-| mmul      | +0.248%     |
-| qap       | +0.043%     |
-| nbody     | −0.023%     |
-| delannoy  | −0.258%     |
-| ssca2     | −0.276%     |
+It is also enabled by -fprofile-use and -fauto-profile.
+
+| Program  | Improvement |
+| -------- | ----------- |
+| npb_bt_w | +0.823%     |
+| mmul     | +0.248%     |
+| qap      | +0.043%     |
+| nbody    | −0.023%     |
+| delannoy | −0.258%     |
+| ssca2    | −0.276%     |
 
 ---
 
 ### #3 — `-fvect-cost-model=dynamic` (+0.067% mean improvement)
 
-Relaxes the vectorization cost model from `-O2`'s conservative `very-cheap` threshold to `dynamic`, allowing the compiler to vectorize loops where the profitability is uncertain at compile time. Under `dynamic`, the compiler emits both a vectorized and scalar path and selects between them at runtime based on actual loop trip counts.
+Alter the cost model used for vectorization.  The model
+argument should be one of unlimited, dynamic or cheap.  With
+the unlimited model the vectorized code-path is assumed to be
+profitable while with the dynamic model a runtime check guards
+the vectorized code-path to enable it only for iteration
+counts that will likely execute faster than when executing the
+original scalar loop.  The cheap model disables vectorization
+of loops where doing so would be cost prohibitive for example
+due to required runtime checks for data dependence or
+alignment but otherwise is equal to the dynamic model.  The
+default cost model depends on other optimization flags and is
+either dynamic or cheap.
 
-| Program   | Improvement |
-|-----------|-------------|
-| npb_bt_w  | +1.646%     |
-| mmul      | +0.414%     |
-| qap       | −0.171%     |
-| delannoy  | −0.052%     |
-| nbody     | −0.348%     |
-| ssca2     | −1.086%     |
-
-> Beneficial where loops are long and regular (`npb_bt_w`, `mmul`). Counterproductive for `ssca2` and `nbody` — the runtime dispatch overhead and larger code footprint outweigh the vectorization gains for these workloads.
+| Program  | Improvement |
+| -------- | ----------- |
+| npb_bt_w | +1.646%     |
+| mmul     | +0.414%     |
+| qap      | −0.171%     |
+| delannoy | −0.052%     |
+| nbody    | −0.348%     |
+| ssca2    | −1.086%     |
