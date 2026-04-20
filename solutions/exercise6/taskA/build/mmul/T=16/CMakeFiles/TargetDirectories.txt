@@ -1,3 +1,0 @@
-/home/gregor/perf-oriented-dev/solutions/exercise6/taskA/build/mmul/T=16/CMakeFiles/mmul.dir
-/home/gregor/perf-oriented-dev/solutions/exercise6/taskA/build/mmul/T=16/CMakeFiles/edit_cache.dir
-/home/gregor/perf-oriented-dev/solutions/exercise6/taskA/build/mmul/T=16/CMakeFiles/rebuild_cache.dir

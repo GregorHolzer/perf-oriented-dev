@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/home/gregor/perf-oriented-dev/solutions/exercise6/taskA/build/mmul/T=64/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
