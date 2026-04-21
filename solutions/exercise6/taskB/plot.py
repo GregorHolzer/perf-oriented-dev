@@ -3,6 +3,12 @@ import pandas as pd
 import argparse
 import matplotlib
 
+lcc_3regions = [
+        (0,      32,    "#1D9E75", "L1 (32 KB)"),
+        (32,     256,   "#378ADD", "L2 (512 KB)"),
+        (256,    12288, "#7F77DD", "L3 (16 MB)"),
+        (12288,  float("inf"), "#D85A30", "RAM"),
+    ]
 
 def plot(input_file, output_file):
     df = pd.read_csv(input_file)
@@ -13,10 +19,10 @@ def plot(input_file, output_file):
 
     # Cache boundary regions
     regions = [
-        (0,      32,    "#1D9E75", "L1 (32 KB)"),
-        (32,     256,   "#378ADD", "L2 (512 KB)"),
-        (256,    12288, "#7F77DD", "L3 (16 MB)"),
-        (12288,  float("inf"), "#D85A30", "RAM"),
+    (0,      32,    "#1D9E75", "L1 (32 KB)"),
+    (32,     512,   "#378ADD", "L2 (512 KB)"),
+    (512,    16384, "#7F77DD", "L3 (16 MB)"),
+    (16384,  float("inf"), "#D85A30", "RAM"),
     ]
     for x_start, x_end, color, label in regions:
         x_end = min(x_end, df["size_kb"].max())

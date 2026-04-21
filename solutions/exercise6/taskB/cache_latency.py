@@ -1,8 +1,18 @@
 import subprocess
 import csv
+import numpy as np
 
 EXEC_PATH = "./build"
 OUTPUT_FILE = "out.csv"
+
+REPS = 10
+
+lcc3_sizes = sizes = sorted(set([
+        *[2**i for i in range(21)],
+        24, 28, 32, 36, 40, 48,
+        192, 224, 256, 288, 320, 384,
+        8192, 10240, 11264, 12288, 13312, 14336, 16384,
+    ]))
 
 def main():
     sizes = sorted(set([
@@ -21,16 +31,19 @@ def main():
         writer.writerow(["size_kb", "latency_ns"])
 
         for size in sizes:
-            samples = max(1, 10_000 // size)
-            result = subprocess.run(
-                f"srun ./cache_benchmark {size} {samples}",
-                shell=True, cwd=EXEC_PATH, capture_output=True, text=True
-            )
-            if result.stdout:
-                line = result.stdout.strip()
-                print(line)
-                size_kb, latency_ns, _ = line.split(", ")
-                writer.writerow([size_kb, latency_ns])
+            durations = []
+            for i in range(REPS):
+                samples = max(1, 10_000 // size)
+                result = subprocess.run(
+                    f"./cache_benchmark {size} {samples}",
+                    shell=True, cwd=EXEC_PATH, capture_output=True, text=True
+                )
+                if result.stdout:
+                    line = result.stdout.strip()
+                    print(line)
+                    _, latency_ns, _ = line.split(", ")
+                    durations.append(float(latency_ns))
+            writer.writerow([size, np.median(durations)])
 
 if __name__ == "__main__":
     main()
