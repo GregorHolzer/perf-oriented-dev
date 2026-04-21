@@ -14,3 +14,4 @@ tools/build_release
 third_party/
 **/*.tracy
 **/build
+**/env

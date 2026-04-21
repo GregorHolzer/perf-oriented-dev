@@ -219,7 +219,7 @@ def run_optuna_search(
                                    lcc3, massif, definitions, args, rep=i)
                     if row:
                         results.setdefault(prog_name, []).append(row)
-                        print(f"{row["wall_clock_s"]} seconds")
+                        print(f"{row['wall_clock_s']} seconds")
                         wall_times.append(row["wall_clock_s"])
 
         if not wall_times:

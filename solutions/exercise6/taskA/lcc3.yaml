@@ -1,0 +1,17 @@
+programs:
+  mmul:
+    build_path: "./build"
+repetitions: 5
+measurement_program: 
+  path: "/usr/bin/time"
+  args: ["-v"] 
+output:
+  path: "./lcc3"
+lcc3: True
+tile_min: 1
+tile_bound: 2048
+optuna_trials: 30    
+optuna_warmup_reps: 3
+converge: true           
+cv_threshold: 0.05
+max_reps: 20
