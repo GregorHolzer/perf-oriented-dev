@@ -8,8 +8,14 @@
 #define M S
 #define K S
 
-#ifndef T
-#define T 16
+#ifndef M_T
+#define M_T 256
+#endif
+#ifndef N_T
+#define N_T 256
+#endif
+#ifndef K_T
+#define K_T 256
 #endif
 
 #define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
@@ -39,7 +45,6 @@ void freeMatrix(MATRIX matrix)
 
 int main(void)
 {
-	printf("%d\n", S);
 	// create the matrices
 	MATRIX A = createMatrix(N, M);
 	MATRIX B = createMatrix(M, K);
@@ -65,17 +70,17 @@ int main(void)
 		}
 	}
 
-	for (int m_tile = 0; m_tile < M; m_tile += T)
+	for (int m_tile = 0; m_tile < M; m_tile += M_T)
 	{
-		for (int n_tile = 0; n_tile < N; n_tile += T)
+		for (int n_tile = 0; n_tile < N; n_tile += N_T)
 		{
-			for (int k_tile = 0; k_tile < K; k_tile += T)
+			for (int k_tile = 0; k_tile < K; k_tile += K_T)
 			{
-				for (int m = m_tile; m < MIN(M, m_tile + T); ++m)
+				for (int m = m_tile; m < MIN(M, m_tile + M_T); ++m)
 				{
-					for (int n = n_tile; n < MIN(N, n_tile + T); ++n)
+					for (int n = n_tile; n < MIN(N, n_tile + N_T); ++n)
 					{
-						for (int k = k_tile; k < MIN(K, k_tile + T); ++k)
+						for (int k = k_tile; k < MIN(K, k_tile + K_T); ++k)
 						{
 							C[m][k] += A[m][n] * B[n][k];
 						}
