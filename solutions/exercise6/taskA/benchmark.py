@@ -67,7 +67,6 @@ def build_program(prog_name, prog_cfg, definitions: dict):
     source_path = base_build_path.parent
     defines = " ".join(f"-D{k}={v}" for k, v in definitions.items())
     build_cmd = f"cmake -G Ninja {defines} {source_path}"
-    #print(f"Building {prog_name} [{defines_slug(definitions)}]")
     try:
         subprocess.run(build_cmd, cwd=build_path, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         subprocess.run(f"ninja {prog_name}", cwd=build_path, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
@@ -85,10 +84,6 @@ def tile_sizes(min_tile: int, bound: int) -> list[int]:
 
 def run_tile(prog_name, prog_cfg, meas_path, meas_args, lcc3, massif,
              definitions: dict, args: list, rep: int) -> dict | None:
-    """
-    Build (if needed) and run one (definitions, args) combo for one rep.
-    Returns a metrics dict, or None if meas_path is not set.
-    """
     build_program(prog_name, prog_cfg, definitions)
 
     build_path = get_build_path(prog_name, prog_cfg, definitions)
@@ -98,16 +93,10 @@ def run_tile(prog_name, prog_cfg, meas_path, meas_args, lcc3, massif,
     args_str = " ".join(str(a) for a in args)
 
     base_cmd = prefix + [str(prog_path)] + [str(a) for a in args]
-    if massif:
-        cmd = ([meas_path] + meas_args +
-               ["/usr/bin/valgrind", "--tool=massif", "--time-unit=ms"] +
-               base_cmd) if meas_path else base_cmd
-    else:
-        cmd = ([meas_path] + meas_args + base_cmd) if meas_path else base_cmd
+    cmd = ([meas_path] + meas_args + base_cmd) if meas_path else base_cmd
     if lcc3:
         cmd = ["srun"] + cmd
 
-    #print(f"  [{prog_name}|{defines_str}] rep={rep} cmd: {' '.join(cmd)}")
     try:
         result = subprocess.run(cmd, stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE, universal_newlines=True)
@@ -125,7 +114,6 @@ def run_tile(prog_name, prog_cfg, meas_path, meas_args, lcc3, massif,
 
 
 def get_unconverged_combos(rows: list, cv_threshold: float = 0.05) -> set:
-    """Returns set of (defines, args) combos that haven't converged yet."""
     if not rows:
         return None
     unconverged = set()
@@ -191,13 +179,6 @@ def run_optuna_search(
     n_warmup_reps: int,
     results: dict[str, list],
 ):
-    """
-    Run an Optuna TPE study for one program.
-
-    Each trial picks (M_T, N_T, K_T) from `sizes`, runs `n_warmup_reps`
-    repetitions, and reports the mean wall_clock_s to Optuna.
-    All raw rows are appended to results[prog_name] for CSV export.
-    """
     raw_defines      = prog_cfg.get("defines", [{}])
     raw_args         = prog_cfg.get("args", [[]])
     base_define_list = [e if isinstance(e, dict) else {} for e in raw_defines]
@@ -248,7 +229,6 @@ def run_convergence(
     cv_threshold: float = 0.05,
     max_reps: int = 20,
 ):
-    """Extra reps on unconverged combos found by the Optuna search."""
     rows = results.get(prog_name, [])
     rep = max((r["rep"] for r in rows), default=-1) + 1
 
@@ -274,8 +254,6 @@ def run_convergence(
     else:
         print(f"  [{prog_name}] Hit max reps ({max_reps}) without full convergence")
 
-
-# ── Experiment entry point ────────────────────────────────────────────────────
 
 def run_experiment(config: dict):
     lcc3      = config.get("lcc3", True)

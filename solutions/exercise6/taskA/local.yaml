@@ -10,7 +10,7 @@ output:
 lcc3: False
 tile_min: 1
 tile_bound: 2048
-optuna_trials: 150    
+optuna_trials: 30    
 optuna_warmup_reps: 3
 converge: true           
 cv_threshold: 0.05
