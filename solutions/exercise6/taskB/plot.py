@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import argparse
+import matplotlib
 
 
 def plot(input_file, output_file):
@@ -13,9 +14,9 @@ def plot(input_file, output_file):
     # Cache boundary regions
     regions = [
         (0,      32,    "#1D9E75", "L1 (32 KB)"),
-        (32,     512,   "#378ADD", "L2 (512 KB)"),
-        (512,    16384, "#7F77DD", "L3 (16 MB)"),
-        (16384,  float("inf"), "#D85A30", "RAM"),
+        (32,     256,   "#378ADD", "L2 (512 KB)"),
+        (256,    12288, "#7F77DD", "L3 (16 MB)"),
+        (12288,  float("inf"), "#D85A30", "RAM"),
     ]
     for x_start, x_end, color, label in regions:
         x_end = min(x_end, df["size_kb"].max())
@@ -25,15 +26,11 @@ def plot(input_file, output_file):
     ax.set_yscale("log", base=2)
     ax.set_xlabel("Buffer size (KB)", fontsize=12)
     ax.set_ylabel("Latency (ns)", fontsize=12)
-    ax.set_title("Cache latency by buffer size", fontsize=14)
+    ax.set_title("LCC3", fontsize=14)
     ax.legend()
     ax.grid(True, which="both", linestyle="--", alpha=0.4)
-    ax.set_xticks(df["size_kb"])
-    ax.set_xticklabels([
-        f"{s}M" if s >= 1024 else f"{s}K"
-        for s in df["size_kb"]
-    ], rotation=45)
-
+    ax.set_xlim(1, df["size_kb"].max())
+    ax.yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
     fig.tight_layout()
     fig.savefig(output_file, dpi=150)
     print(f"Saved to {output_file}")
