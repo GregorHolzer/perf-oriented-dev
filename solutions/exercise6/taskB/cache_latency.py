@@ -7,7 +7,7 @@ OUTPUT_FILE = "out.csv"
 
 REPS = 10
 
-LCC3 = False
+LCC3 = True
 
 lcc3_sizes = sizes = sorted(set([
         *[2**i for i in range(21)],
@@ -34,8 +34,10 @@ def main():
             durations = []
             for i in range(REPS):
                 samples = max(1, 10_000 // size)
+                cmd = f"./cache_benchmark {size} {samples}"
+                if LCC3: cmd = f"srun ./cache_benchmark {size} {samples}"
                 result = subprocess.run(
-                    f"./cache_benchmark {size} {samples}",
+                    cmd,
                     shell=True, cwd=EXEC_PATH, capture_output=True, text=True
                 )
                 if result.stdout:
