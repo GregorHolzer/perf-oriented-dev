@@ -7,7 +7,7 @@ OUTPUT_FILE = "out.csv"
 
 REPS = 10
 
-LCC3 = True
+LCC3 = False
 
 lcc3_sizes = sizes = sorted(set([
         *[2**i for i in range(9, 29)],
@@ -18,10 +18,10 @@ lcc3_sizes = sizes = sorted(set([
 
 def main():
     sizes = sorted(set([
-        *[2**i for i in range(-2,21)],
-        24, 28, 36, 40, 48,       
-        384, 448, 640, 768,      
-        12288, 14336, 18432, 20480 
+        *[2**i for i in range(9,29)],
+        24576, 28672, 31130, 32768, 34406, 36864, 40960,
+        393216, 458752, 498073, 524288, 550502, 589824, 655360,
+        14680064, 15728640, 16252928, 16777216, 17301504, 17825792, 18874368
     ]))
 
     if LCC3: sizes = lcc3_sizes

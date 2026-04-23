@@ -11,7 +11,7 @@ lcc_3regions = [
     (12288*1024,      float("inf"), "#D85A30", "RAM"),
 ]
 
-LCC3 = True
+LCC3 = False
 
 TITLE_LCC3 = "LCC3 - Intel(R) Xeon(R) X5650"
 
@@ -23,10 +23,10 @@ def plot(input_file, output_file):
     ax.plot(df["size_kb"], df["latency_ns"], marker="o", linewidth=2, markersize=4, color="#378ADD")
 
     regions = [
-    (0,      32,    "#1D9E75", "L1 (32 KB)"),
-    (32,     512,   "#378ADD", "L2 (512 KB)"),
-    (512,    16384, "#7F77DD", "L3 (16 MB)"),
-    (16384,  float("inf"), "#D85A30", "RAM"),
+        (0,               2**15,       "#1D9E75", "L1 (32 KiB)"),   # 32 * 1024
+        (2**15,           2**19,       "#378ADD", "L2 (512 KiB)"),  # 512 * 1024
+        (2**19,           2**24,       "#7F77DD", "L3 (16 MiB)"),   # 16384 * 1024
+        (2**24,           float("inf"), "#D85A30", "RAM"),
     ]
     title = "AMD Ryzen 5 3600X 6-Core"
     if LCC3: 
