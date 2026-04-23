@@ -11,7 +11,7 @@ lcc_3regions = [
         (12288,  float("inf"), "#D85A30", "RAM"),
     ]
 
-LCC3 = False
+LCC3 = True
 
 TITLE_LCC3 = "LCC3 - Intel(R) Xeon(R) X5650"
 
@@ -41,7 +41,7 @@ def plot(input_file, output_file):
     max_power = int(np.ceil(np.log2(df["size_kb"].max())))
     powers_of_2 = [2**i for i in range(max_power + 1)]
     ax.set_xlabel("Buffer Size", fontsize=12)
-    ax.set_ylabel("Latency [ns]", fontsize=12)
+    ax.set_ylabel("Median Latency [ns]", fontsize=12)
     ax.set_title(title, fontsize=14)
     ax.legend()
     ax.grid(True, which="both", linestyle="--", alpha=0.4)
