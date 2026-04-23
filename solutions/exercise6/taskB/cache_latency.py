@@ -7,6 +7,8 @@ OUTPUT_FILE = "out.csv"
 
 REPS = 10
 
+LCC3 = False
+
 lcc3_sizes = sizes = sorted(set([
         *[2**i for i in range(21)],
         24, 28, 32, 36, 40, 48,
@@ -16,15 +18,13 @@ lcc3_sizes = sizes = sorted(set([
 
 def main():
     sizes = sorted(set([
-        # Normal powers of 2
         *[2**i for i in range(21)],
-        # L1 boundary (~32 KB)
-        24, 28, 32, 36, 40, 48,
-        # L2 boundary (~256 KB)
-        192, 224, 256, 288, 320, 384,
-        # L3 boundary (~12 MB)
-        8192, 10240, 11264, 12288, 13312, 14336, 16384,
+        24, 28, 36, 40, 48,       
+        384, 448, 640, 768,      
+        12288, 14336, 18432, 20480 
     ]))
+
+    if LCC3: sizes = lcc3_sizes
     
     with open(OUTPUT_FILE, "w", newline="") as f:
         writer = csv.writer(f)
