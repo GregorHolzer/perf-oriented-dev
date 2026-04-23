@@ -45,7 +45,7 @@ int main(int argc, char **argv)
   int buffer_s = strtol(argv[1], NULL, 10);
   int samples = strtol(argv[2], NULL, 10);
   srand(SEED);
-  size_t num_elements = buffer_s * 1024 / sizeof(node);
+  size_t num_elements = buffer_s / sizeof(node);
   node *buffer = create_buffer(num_elements);
   node *current_node = &buffer[0];
 

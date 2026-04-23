@@ -7,18 +7,18 @@ OUTPUT_FILE = "out.csv"
 
 REPS = 10
 
-LCC3 = False
+LCC3 = True
 
 lcc3_sizes = sizes = sorted(set([
-        *[2**i for i in range(21)],
-        24, 28, 32, 36, 40, 48,
-        192, 224, 256, 288, 320, 384,
-        8192, 10240, 11264, 12288, 13312, 14336, 16384,
+        *[2**i for i in range(9, 29)],
+        24576, 28672, 31130, 32768, 34406, 36864, 40960,
+        196608, 229376, 249037, 262144, 275251, 294912, 327680,
+        9437184, 10485760, 11534336, 12288000, 12582912, 12877824, 13631488, 15099494
     ]))
 
 def main():
     sizes = sorted(set([
-        *[2**i for i in range(21)],
+        *[2**i for i in range(-2,21)],
         24, 28, 36, 40, 48,       
         384, 448, 640, 768,      
         12288, 14336, 18432, 20480 
@@ -33,7 +33,7 @@ def main():
         for size in sizes:
             durations = []
             for i in range(REPS):
-                samples = max(1, 10_000 // size)
+                samples = 5
                 cmd = f"./cache_benchmark {size} {samples}"
                 if LCC3: cmd = f"srun ./cache_benchmark {size} {samples}"
                 result = subprocess.run(

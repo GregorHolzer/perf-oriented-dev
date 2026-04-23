@@ -5,11 +5,11 @@ import matplotlib.ticker as ticker
 import numpy as np
 
 lcc_3regions = [
-        (0,      32,    "#1D9E75", "L1 (32 KB)"),
-        (32,     256,   "#378ADD", "L2 (256 KB)"),
-        (256,    12288, "#7F77DD", "L3 (12 MB)"),
-        (12288,  float("inf"), "#D85A30", "RAM"),
-    ]
+    (0,               2**15,       "#1D9E75", "L1 (32 KiB)"),   
+    (2**15,           2**18,       "#378ADD", "L2 (256 KiB)"),  
+    (2**18,           12288*1024,  "#7F77DD", "L3 (12 MiB)"),   
+    (12288*1024,      float("inf"), "#D85A30", "RAM"),
+]
 
 LCC3 = True
 
@@ -45,11 +45,14 @@ def plot(input_file, output_file):
     ax.set_title(title, fontsize=14)
     ax.legend()
     ax.grid(True, which="both", linestyle="--", alpha=0.4)
-    ax.set_xlim(1, df["size_kb"].max())
+    ax.set_xlim(512, df["size_kb"].max())
     ax.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.0f}"))
     ax.xaxis.set_major_locator(ticker.FixedLocator(powers_of_2))
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(
-        lambda x, pos: f"{int(x)} KB" if x < 1024 else f"{int(x/1024)} MB"
+    lambda x, pos: 
+        f"{int(x)} Byte" if x < 1024 else (
+            f"{int(x/1024)} KiB" if x < 1048576 else f"{int(x/1048576)} MiB"
+        )
     ))
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
     fig.tight_layout()
