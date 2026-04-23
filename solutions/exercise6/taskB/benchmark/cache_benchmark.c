@@ -14,11 +14,11 @@ typedef struct node
 node *create_buffer(size_t num_elements)
 {
   node *buffer = malloc(num_elements * sizeof(node));
-
-  // Create a random permutation using Fisher-Yates
   size_t *perm = malloc(num_elements * sizeof(size_t));
   for (size_t i = 0; i < num_elements; ++i)
+  {
     perm[i] = i;
+  }
   for (size_t i = num_elements - 1; i > 0; --i)
   {
     size_t j = rand() % (i + 1);
@@ -26,10 +26,10 @@ node *create_buffer(size_t num_elements)
     perm[i] = perm[j];
     perm[j] = tmp;
   }
-
-  // Link nodes in permutation order (forms a single cycle)
   for (size_t i = 0; i < num_elements - 1; ++i)
+  {
     buffer[perm[i]].next = &buffer[perm[i + 1]];
+  }
   buffer[perm[num_elements - 1]].next = &buffer[perm[0]];
 
   free(perm);
@@ -51,9 +51,17 @@ int main(int argc, char **argv)
 
   size_t total = (size_t)samples * num_elements;
 
+  // Load as much into Caches as possible
+  for (size_t i = 0; i < num_elements; ++i)
+  {
+    current_node = current_node->next;
+  }
+
   double start = omp_get_wtime();
   for (size_t i = 0; i < total; ++i)
+  {
     current_node = current_node->next;
+  }
   double end = omp_get_wtime();
 
   printf("%d, %f, %p\n", buffer_s, (end - start) * 1e9 / total, (void *)current_node->next);
