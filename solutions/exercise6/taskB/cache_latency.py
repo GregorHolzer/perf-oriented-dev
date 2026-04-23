@@ -7,7 +7,7 @@ OUTPUT_FILE = "out.csv"
 
 REPS = 10
 
-LCC3 = True
+LCC3 = False
 
 lcc3_sizes = sizes = sorted(set([
         *[2**i for i in range(21)],
