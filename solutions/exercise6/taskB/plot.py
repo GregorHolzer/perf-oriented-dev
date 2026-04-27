@@ -11,7 +11,7 @@ lcc_3regions = [
     (12288*1024,      float("inf"), "#D85A30", "RAM"),
 ]
 
-LCC3 = False
+LCC3 = True
 
 TITLE_LCC3 = "LCC3 - Intel(R) Xeon(R) X5650"
 
