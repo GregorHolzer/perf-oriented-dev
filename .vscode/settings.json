@@ -1,4 +1,7 @@
 {
     "git.ignoreLimitWarning": true,
-    "cmake.sourceDirectory": "/home/gregor/perf-oriented-dev/small_samples"
+    "cmake.sourceDirectory": "/home/gregor/perf-oriented-dev/small_samples",
+    "files.associations": {
+        "*.c": "c"
+    }
 }

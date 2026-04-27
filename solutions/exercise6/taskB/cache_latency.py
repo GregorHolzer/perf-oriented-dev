@@ -45,7 +45,7 @@ def main():
                     print(line)
                     _, latency_ns, _ = line.split(", ")
                     durations.append(float(latency_ns))
-            writer.writerow([size, np.median(durations)])
+            writer.writerow([size, np.min(durations)])
 
 if __name__ == "__main__":
     main()
