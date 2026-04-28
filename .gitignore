@@ -11,7 +11,6 @@ tools/build
 tools/build_debug
 tools/build_release
 **/generated
-third_party/
 **/*.tracy
 **/build
 **/env
