@@ -7,3 +7,6 @@
 [submodule "third_party/mimalloc"]
 	path = third_party/mimalloc
 	url = git@github.com:microsoft/mimalloc.git
+[submodule "solutions/exercise7/taskA/allscale_api"]
+	path = solutions/exercise7/taskA/allscale_api
+	url = git@github.com:allscale/allscale_api.git
