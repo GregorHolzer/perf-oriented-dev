@@ -23,5 +23,6 @@ for bar, val in zip(bars, values):
 ax.set_title("Default vs Custom Allocator", fontsize=14, fontweight="bold")
 ax.set_ylabel("Wall Clock")
 ax.set_ylim(0, max(values) * 1.1)
+ax.grid(axis="y", linestyle="--", alpha=0.4)
 fig.tight_layout()
 fig.savefig("./result.png", dpi=300)
