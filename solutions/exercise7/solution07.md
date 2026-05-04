@@ -22,7 +22,7 @@
 
 ### Wall Clock
 
-<image src=./taskB/result.png>
+<image src=./taskB/result.png width=700>
 
 #### Raw CSV Files:
 
