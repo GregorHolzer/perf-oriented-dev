@@ -7,9 +7,16 @@
 #include <vector>
 
 #define SEED 1234
-#define BENCHMARK_DURATION_SEC 5
-#define MINIMUM_OPERATIONS 100
-#define N 1000
+#define BENCHMARK_DURATION_SEC 2
+#define MINIMUM_ROUNDS 100
+#ifndef SIZE
+#define SIZE 8
+#endif
+
+struct MyEntry
+{
+  char data[SIZE];
+};
 
 class BenchmarkResult
 {
@@ -77,11 +84,7 @@ erase_container(LinkedList<T>& list, size_t pos)
 
 template<template<class...> class Container, class T>
 inline void
-read_write(Container<T>& c,
-           T& element,
-           int& idx,
-           BenchmarkResult& result,
-           const size_t& size)
+read_write(Container<T>& c, T& element, int& idx, BenchmarkResult& result)
 {
   if (result.read_writes % 2 == 0) {
     element = *(get_iterator(c, idx));
@@ -89,26 +92,20 @@ read_write(Container<T>& c,
     *(get_iterator(c, idx)) = element;
   }
   ++result.read_writes;
-  idx = (idx + 1) % size;
+  idx = (idx + 1) % c.size();
 }
 
 template<template<class...> class Container, class T>
 inline void
-insert_delete(Container<T>& c,
-              T& element,
-              int& idx,
-              BenchmarkResult& result,
-              size_t& size)
+insert_delete(Container<T>& c, T& element, int& idx, BenchmarkResult& result)
 {
   if (result.ins_del % 2 == 0) {
     insert_container(c, element, idx);
-    ++size;
   } else {
     erase_container(c, idx);
-    --size;
   }
   ++result.ins_del;
-  idx = (idx + 1) % size;
+  idx = (idx + 1) % c.size();
 }
 
 template<template<class...> class Container, class T>
@@ -116,27 +113,28 @@ BenchmarkResult
 benchmark(Container<T>& c, float insert_delete_fraction)
 {
   int idx = 0;
-  size_t size = N;
   auto result = BenchmarkResult();
   auto start_time = omp_get_wtime();
   auto passed_time = omp_get_wtime() - start_time;
   auto element = *(c.begin());
   if (insert_delete_fraction == 0.0f) {
     while (passed_time < BENCHMARK_DURATION_SEC) {
-      for (int i = 0; i < MINIMUM_OPERATIONS; ++i) {
-        read_write(c, element, idx, result, size);
+      for (int i = 0; i < MINIMUM_ROUNDS; ++i) {
+        read_write(c, element, idx, result);
       }
       passed_time = omp_get_wtime() - start_time;
     }
   } else {
     int swap_rate = (int)(1.0f / insert_delete_fraction);
+    int operation_counter = 0;
     while (passed_time < BENCHMARK_DURATION_SEC) {
-      for (int i = 0; i < MINIMUM_OPERATIONS; ++i) {
-        if (i % swap_rate == 0) {
-          insert_delete(c, element, idx, result, size);
+      for (int i = 0; i < MINIMUM_ROUNDS; ++i) {
+        if (operation_counter % swap_rate == 0) {
+          insert_delete(c, element, idx, result);
         } else {
-          read_write(c, element, idx, result, size);
+          read_write(c, element, idx, result);
         }
+        ++operation_counter;
       }
       passed_time = omp_get_wtime() - start_time;
     }
@@ -145,44 +143,35 @@ benchmark(Container<T>& c, float insert_delete_fraction)
   return result;
 }
 
-template<class T>
-void
-shuffel_list(std::forward_list<T>& list, size_t length, int seed)
-{
-  srand(seed);
-  auto vector = std::vector<unsigned>(length);
-  std::iota(vector.begin(), vector.end(), 0);
-  for (size_t i = length - 1; i > 0; --i) {
-    size_t j = rand() % i;
-    std::swap(vector[i], vector[j]);
-  }
-}
-
 int
 main(int argc, char** argv)
 {
   if (argc != 4) {
     std::cout
-      << "Usage: ./benchmark <number_elements> <size_elements> <ins_del_ratio>"
+      << "Usage: ./benchmark <container_type> <number_elements> <ins_del_ratio>"
       << std::endl;
     return EXIT_FAILURE;
   }
 
-  int n = std::stoi(argv[1]);
-  int size = std::stoi(argv[2]);
+  std::string container_type = argv[1];
+  int n = std::stoi(argv[2]);
   float ratio = std::stof(argv[3]);
 
-  auto vec = std::vector<int>(n, 1);
-  std::cout << "Vector:" << std::endl << benchmark(vec, ratio) << std::endl;
-
-  auto list = LinkedList<int>();
-  list.insert_after(list.before_begin(), 0);
-  for (int i = 1; i < n; ++i) {
-    list.insert_after(get_iterator(list, i - 1), i);
+  if (container_type == "vector") {
+    auto vec = std::vector<MyEntry>(n, MyEntry{ 1 });
+    std::cout << benchmark(vec, ratio) << std::endl;
+  } else if (container_type == "list") {
+    auto list = LinkedList<MyEntry>();
+    for (int i = 0; i < n; ++i) {
+      list.push_front(MyEntry{ (char)i });
+    }
+    std::cout << benchmark(list, ratio) << std::endl;
+  } else if (container_type == "list_shuffled") {
+    auto list = LinkedList<MyEntry>();
+    for (int i = 0; i < n; ++i) {
+      list.push_front(MyEntry{ (char)i });
+    }
+    list.shuffle_list(SEED);
+    std::cout << benchmark(list, ratio) << std::endl;
   }
-  std::cout << "Linked List:" << std::endl
-            << benchmark(list, ratio) << std::endl;
-  list.shuffle_list(SEED);
-  std::cout << "Shuffeld Linked List:" << std::endl
-            << benchmark(list, ratio) << std::endl;
 }

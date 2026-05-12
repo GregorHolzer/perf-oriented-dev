@@ -125,3 +125,15 @@ LinkedList<T>::shuffle_list(int seed)
   }
   nodes[vec[_size - 1]]->next = nullptr;
 }
+
+template<class T>
+LinkedList<T>::iterator
+LinkedList<T>::push_front(const T& value)
+{
+  auto node = new LinkedListNode<T>();
+  node->value = value;
+  node->next = before_start_node.next;
+  before_start_node.next = node;
+  ++_size;
+  return iterator(node);
+}

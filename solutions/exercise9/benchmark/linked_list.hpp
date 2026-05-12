@@ -23,10 +23,10 @@ public:
     friend class LinkedList<T>;
 
   public:
-    iterator(LinkedListNode<T>* ptr);
+    iterator(LinkedListNode<T>*);
     T& operator*();
     iterator& operator++();
-    bool operator!=(const iterator& other);
+    bool operator!=(const iterator&);
 
   private:
     LinkedListNode<T>* ptr;
@@ -40,8 +40,9 @@ public:
 
   size_t size();
 
-  iterator insert_after(iterator pos, const T& value);
-  iterator erase_after(iterator pos);
+  iterator insert_after(iterator, const T&);
+  iterator erase_after(iterator);
+  iterator push_front(const T&);
 
   void shuffle_list(int);
 

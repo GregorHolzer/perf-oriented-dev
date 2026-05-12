@@ -12,5 +12,11 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic -O3)
 endif()
 
+if(NOT DEFINED ENTRY_SIZE)
+  set(ENTRY_SIZE 8)
+endif()
+
 add_executable(benchmark benchmark/benchmark.cpp)
 target_link_libraries(benchmark PRIVATE OpenMP::OpenMP_CXX)
+
+target_compile_definitions(benchmark PRIVATE SIZE=${ENTRY_SIZE})
