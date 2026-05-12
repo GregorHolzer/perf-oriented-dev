@@ -1,6 +1,8 @@
 #include "linked_list.hpp"
+#include <forward_list>
 #include <iomanip>
 #include <iostream>
+#include <numeric>
 #include <omp.h>
 #include <vector>
 
@@ -24,30 +26,89 @@ operator<<(std::ostream& os, const BenchmarkResult& r)
             << r.elapsed_time_sec << "s";
 }
 
-template<template<class...> class Container, class T>
-inline void
-read_write(Container<T>& c, T& element, int& idx, BenchmarkResult& result)
+template<class T>
+typename LinkedList<T>::iterator
+get_iterator(LinkedList<T>& list, int n)
 {
-  if (result.read_writes % 2 == 0) {
-    element = c[idx];
-  } else {
-    c[idx] = element;
-  }
-  ++result.read_writes;
-  idx = (idx + 1) % c.size();
+  auto it = list.begin();
+  for (int i = 0; i < n; ++i)
+    ++it;
+  return it;
+}
+
+template<class T>
+typename std::vector<T>::iterator
+get_iterator(std::vector<T>& vector, int n)
+{
+  return vector.begin() + n;
+}
+
+template<class T>
+void
+insert_container(std::vector<T>& vector, T& element, size_t pos)
+{
+  auto iterator = get_iterator(vector, pos);
+  vector.insert(iterator, element);
+}
+
+template<class T>
+void
+erase_container(std::vector<T>& vector, size_t pos)
+{
+  auto iterator = get_iterator(vector, pos);
+  vector.erase(iterator);
+}
+
+template<class T>
+void
+insert_container(LinkedList<T>& list, T& element, size_t pos)
+{
+  auto iterator = get_iterator(list, pos);
+  list.insert_after(iterator, element);
+}
+
+template<class T>
+void
+erase_container(LinkedList<T>& list, size_t pos)
+{
+  auto iterator = get_iterator(list, pos);
+  list.erase_after(iterator);
 }
 
 template<template<class...> class Container, class T>
 inline void
-insert_delete(Container<T>& c, T& element, int& idx, BenchmarkResult& result)
+read_write(Container<T>& c,
+           T& element,
+           int& idx,
+           BenchmarkResult& result,
+           const size_t& size)
+{
+  if (result.read_writes % 2 == 0) {
+    element = *(get_iterator(c, idx));
+  } else {
+    *(get_iterator(c, idx)) = element;
+  }
+  ++result.read_writes;
+  idx = (idx + 1) % size;
+}
+
+template<template<class...> class Container, class T>
+inline void
+insert_delete(Container<T>& c,
+              T& element,
+              int& idx,
+              BenchmarkResult& result,
+              size_t& size)
 {
   if (result.ins_del % 2 == 0) {
-    c.insert(c.begin() + idx, element);
+    insert_container(c, element, idx);
+    ++size;
   } else {
-    c.erase(c.begin() + idx);
+    erase_container(c, idx);
+    --size;
   }
   ++result.ins_del;
-  idx = (idx + 1) % c.size();
+  idx = (idx + 1) % size;
 }
 
 template<template<class...> class Container, class T>
@@ -55,14 +116,15 @@ BenchmarkResult
 benchmark(Container<T>& c, float insert_delete_fraction)
 {
   int idx = 0;
+  size_t size = N;
   auto result = BenchmarkResult();
   auto start_time = omp_get_wtime();
   auto passed_time = omp_get_wtime() - start_time;
-  auto element = c[idx];
+  auto element = *(c.begin());
   if (insert_delete_fraction == 0.0f) {
     while (passed_time < BENCHMARK_DURATION_SEC) {
       for (int i = 0; i < MINIMUM_OPERATIONS; ++i) {
-        read_write(c, element, idx, result);
+        read_write(c, element, idx, result, size);
       }
       passed_time = omp_get_wtime() - start_time;
     }
@@ -71,27 +133,56 @@ benchmark(Container<T>& c, float insert_delete_fraction)
     while (passed_time < BENCHMARK_DURATION_SEC) {
       for (int i = 0; i < MINIMUM_OPERATIONS; ++i) {
         if (i % swap_rate == 0) {
-          insert_delete(c, element, idx, result);
+          insert_delete(c, element, idx, result, size);
         } else {
-          read_write(c, element, idx, result);
+          read_write(c, element, idx, result, size);
         }
       }
       passed_time = omp_get_wtime() - start_time;
     }
-    auto vec = std::vector<int>(N);
   }
   result.elapsed_time_sec = passed_time;
   return result;
 }
 
-int
-main(void) noexcept
+template<class T>
+void
+shuffel_list(std::forward_list<T>& list, size_t length, int seed)
 {
-  auto vec = std::vector<int>(N, 1);
-  std::cout << benchmark(vec, 0.5) << std::endl;
+  srand(seed);
+  auto vector = std::vector<unsigned>(length);
+  std::iota(vector.begin(), vector.end(), 0);
+  for (size_t i = length - 1; i > 0; --i) {
+    size_t j = rand() % i;
+    std::swap(vector[i], vector[j]);
+  }
+}
+
+int
+main(int argc, char** argv)
+{
+  if (argc != 4) {
+    std::cout
+      << "Usage: ./benchmark <number_elements> <size_elements> <ins_del_ratio>"
+      << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  int n = std::stoi(argv[1]);
+  int size = std::stoi(argv[2]);
+  float ratio = std::stof(argv[3]);
+
+  auto vec = std::vector<int>(n, 1);
+  std::cout << "Vector:" << std::endl << benchmark(vec, ratio) << std::endl;
 
   auto list = LinkedList<int>();
-  for (int i = 0; i < N; i++)
-    list.insert(list.begin() + i, i);
-  std::cout << benchmark(list, 0.5) << std::endl;
+  list.insert_after(list.before_begin(), 0);
+  for (int i = 1; i < n; ++i) {
+    list.insert_after(get_iterator(list, i - 1), i);
+  }
+  std::cout << "Linked List:" << std::endl
+            << benchmark(list, ratio) << std::endl;
+  list.shuffle_list(SEED);
+  std::cout << "Shuffeld Linked List:" << std::endl
+            << benchmark(list, ratio) << std::endl;
 }

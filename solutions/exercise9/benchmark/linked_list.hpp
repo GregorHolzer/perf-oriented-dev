@@ -2,9 +2,14 @@
 #include <cstddef>
 
 template<class T>
+class LinkedList;
+
+template<class T>
 class LinkedListNode
 {
-public:
+  friend class LinkedList<T>;
+
+private:
   LinkedListNode* next = nullptr;
   T value;
 };
@@ -15,34 +20,34 @@ class LinkedList
 public:
   class iterator
   {
-    friend class LinkedList;
+    friend class LinkedList<T>;
 
   public:
     iterator(LinkedListNode<T>* ptr);
     T& operator*();
     iterator& operator++();
-    iterator operator+(unsigned int n);
     bool operator!=(const iterator& other);
 
   private:
     LinkedListNode<T>* ptr;
   };
 
+  ~LinkedList();
+
   iterator begin();
   iterator end();
-
-  T& operator[](size_t pos);
+  iterator before_begin();
 
   size_t size();
 
-  iterator insert(iterator pos, const T& value);
-  iterator erase(iterator pos);
+  iterator insert_after(iterator pos, const T& value);
+  iterator erase_after(iterator pos);
 
-  // void shuffle_list(int);
+  void shuffle_list(int);
 
 private:
-  LinkedListNode<T>* head = nullptr;
-  size_t __size = 0;
+  LinkedListNode<T> before_start_node = LinkedListNode<T>();
+  size_t _size = 0;
 };
 
 #include "linked_list_impl.hpp"
