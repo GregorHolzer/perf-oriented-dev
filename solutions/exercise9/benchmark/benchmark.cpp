@@ -5,6 +5,7 @@
 #include <memory>
 #include <numeric>
 #include <omp.h>
+#include <sys/resource.h>
 #include <vector>
 
 #define SEED 1234
@@ -113,6 +114,8 @@ template<template<class...> class Container, class T>
 BenchmarkResult
 benchmark(Container<T>& c, float insert_delete_fraction)
 {
+  auto line = std::string(50, '-');
+  std::cout << "Starting Benchmark\n" << line << std::endl;
   int idx = 0;
   auto result = BenchmarkResult();
   auto start_time = omp_get_wtime();
@@ -153,7 +156,10 @@ main(int argc, char** argv)
       << std::endl;
     return EXIT_FAILURE;
   }
-
+  struct rlimit rl;
+  getrlimit(RLIMIT_STACK, &rl);
+  rl.rlim_cur = 256 * 1024 * 1024;
+  setrlimit(RLIMIT_STACK, &rl);
   std::string container_type = argv[1];
   int n = std::stoi(argv[2]);
   float ratio = std::stof(argv[3]);
@@ -161,7 +167,11 @@ main(int argc, char** argv)
   auto element = std::make_unique<MyEntry>();
 
   if (container_type == "vector") {
-    auto vec = std::vector<MyEntry>(n, *element);
+    auto vec = std::vector<MyEntry>();
+    vec.reserve(n + 10);
+    for (int i = 0; i < n; ++i) {
+      vec.push_back(*element);
+    }
     std::cout << benchmark(vec, ratio) << std::endl;
   } else if (container_type == "list") {
     auto list = LinkedList<MyEntry>();
