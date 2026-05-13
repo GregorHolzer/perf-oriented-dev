@@ -2,6 +2,7 @@
 #include <forward_list>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <numeric>
 #include <omp.h>
 #include <vector>
@@ -116,11 +117,11 @@ benchmark(Container<T>& c, float insert_delete_fraction)
   auto result = BenchmarkResult();
   auto start_time = omp_get_wtime();
   auto passed_time = omp_get_wtime() - start_time;
-  auto element = *(c.begin());
+  auto element = std::make_unique<T>(*(c.begin()));
   if (insert_delete_fraction == 0.0f) {
     while (passed_time < BENCHMARK_DURATION_SEC) {
       for (int i = 0; i < MINIMUM_ROUNDS; ++i) {
-        read_write(c, element, idx, result);
+        read_write(c, *element, idx, result);
       }
       passed_time = omp_get_wtime() - start_time;
     }
@@ -130,9 +131,9 @@ benchmark(Container<T>& c, float insert_delete_fraction)
     while (passed_time < BENCHMARK_DURATION_SEC) {
       for (int i = 0; i < MINIMUM_ROUNDS; ++i) {
         if (operation_counter % swap_rate == 0) {
-          insert_delete(c, element, idx, result);
+          insert_delete(c, *element, idx, result);
         } else {
-          read_write(c, element, idx, result);
+          read_write(c, *element, idx, result);
         }
         ++operation_counter;
       }
@@ -157,19 +158,21 @@ main(int argc, char** argv)
   int n = std::stoi(argv[2]);
   float ratio = std::stof(argv[3]);
 
+  auto element = std::make_unique<MyEntry>();
+
   if (container_type == "vector") {
-    auto vec = std::vector<MyEntry>(n, MyEntry{ 1 });
+    auto vec = std::vector<MyEntry>(n, *element);
     std::cout << benchmark(vec, ratio) << std::endl;
   } else if (container_type == "list") {
     auto list = LinkedList<MyEntry>();
     for (int i = 0; i < n; ++i) {
-      list.push_front(MyEntry{ (char)i });
+      list.push_front(*element);
     }
     std::cout << benchmark(list, ratio) << std::endl;
   } else if (container_type == "list_shuffled") {
     auto list = LinkedList<MyEntry>();
     for (int i = 0; i < n; ++i) {
-      list.push_front(MyEntry{ (char)i });
+      list.push_front(*element);
     }
     list.shuffle_list(SEED);
     std::cout << benchmark(list, ratio) << std::endl;

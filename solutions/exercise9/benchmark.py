@@ -3,7 +3,7 @@ import subprocess
 import re
 import csv
 
-containers = ["vector", "list", "list_shuffled"]
+containers = ["vector"] #, "list", "list_shuffled"]
 
 elements = [10, 1000 ,100000, 10000000]
 
@@ -16,6 +16,8 @@ BUILD_DIR = Path("./build")
 CMAKE_DIR = Path("./")
 
 RUNS = 3
+
+LCC3 = False
 
 def build():
   for size in element_size:
@@ -37,9 +39,18 @@ def parse_output(output: str) -> dict:
         "reads_writes": r"reads/writes:\s*([\d]+)",
         "elapsed":      r"elapsed:\s*([\d.]+)s",
     }
-    return {key: re.search(pat, output).group(1) for key, pat in patterns.items()}
+    results = {}
+    for key, pat in patterns.items():
+        match = re.search(pat, output)
+        if match is None:
+            return None 
+        results[key] = int(match.group(1)) if key != "elapsed" else float(match.group(1))
+    return results
 
 def run_experiment(container: str, elements: int, size: int, fraction: float):
+    cmd = f"./benchmark {container} {elements} {fraction}"
+    if(LCC3):
+        cmd = f"./benchmark {container} {elements} {fraction}"
     result = subprocess.run(
         f"./benchmark {container} {elements} {fraction}",
         cwd=get_dir(size),
@@ -48,8 +59,14 @@ def run_experiment(container: str, elements: int, size: int, fraction: float):
         shell=True,
     )
     if result.returncode != 0:
+       print(f"Program failed: {result.stdout} {result.stderr}")
        return
     output = parse_output(result.stdout)
+
+    total_operations = output['ins_del'] + output['reads_writes']
+    if total_operations > 0 and abs(output['ins_del'] / total_operations - fraction) > 1e-2:
+        print(f"Warning: operation ratio does not match: expected: {fraction}, actual: {output['ins_del'] / total_operations}")
+
     output["elements"] = elements
     output["size"] = size
     output["fraction"] = fraction
