@@ -50,9 +50,9 @@ def parse_output(output: str) -> dict:
 def run_experiment(container: str, elements: int, size: int, fraction: float):
     cmd = f"./benchmark {container} {elements} {fraction}"
     if(LCC3):
-        cmd = f"./benchmark {container} {elements} {fraction}"
+        cmd = f"srun ./benchmark {container} {elements} {fraction}"
     result = subprocess.run(
-        f"./benchmark {container} {elements} {fraction}",
+        cmd,
         cwd=get_dir(size),
         capture_output=True,
         text=True,
