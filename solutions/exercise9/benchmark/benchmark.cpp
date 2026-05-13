@@ -84,14 +84,15 @@ erase_container(LinkedList<T>& list, size_t pos)
   list.erase_after(iterator);
 }
 
-template<template<class...> class Container, class T>
+template<template<class...> class Container, class T, class I>
 inline void
-read_write(Container<T>& c, T& element, int& idx, BenchmarkResult& result)
+read_write(Container<T>& c, I& iterator, int& idx, BenchmarkResult& result)
 {
   if (result.read_writes % 2 == 0) {
-    element = *(get_iterator(c, idx));
+    iterator = get_iterator(c, idx);
   } else {
-    *(get_iterator(c, idx)) = element;
+    auto element = std::make_unique<T>();
+    *(get_iterator(c, idx)) = *element;
   }
   ++result.read_writes;
   idx = (idx + 1) % c.size();
@@ -99,10 +100,11 @@ read_write(Container<T>& c, T& element, int& idx, BenchmarkResult& result)
 
 template<template<class...> class Container, class T>
 inline void
-insert_delete(Container<T>& c, T& element, int& idx, BenchmarkResult& result)
+insert_delete(Container<T>& c, int& idx, BenchmarkResult& result)
 {
   if (result.ins_del % 2 == 0) {
-    insert_container(c, element, idx);
+    auto element = std::make_unique<T>();
+    insert_container(c, *element, idx);
   } else {
     erase_container(c, idx);
   }
@@ -110,9 +112,9 @@ insert_delete(Container<T>& c, T& element, int& idx, BenchmarkResult& result)
   idx = (idx + 1) % c.size();
 }
 
-template<template<class...> class Container, class T>
+template<template<class...> class Container, class T, class I>
 BenchmarkResult
-benchmark(Container<T>& c, float insert_delete_fraction)
+benchmark(Container<T>& c, float insert_delete_fraction, I& iterator)
 {
   auto line = std::string(50, '-');
   std::cout << "Starting Benchmark\n" << line << std::endl;
@@ -123,23 +125,19 @@ benchmark(Container<T>& c, float insert_delete_fraction)
   auto element = std::make_unique<T>(*(c.begin()));
   if (insert_delete_fraction == 0.0f) {
     while (passed_time < BENCHMARK_DURATION_SEC) {
-      for (int i = 0; i < MINIMUM_ROUNDS; ++i) {
-        read_write(c, *element, idx, result);
-      }
+      read_write(c, iterator, idx, result);
       passed_time = omp_get_wtime() - start_time;
     }
   } else {
     int swap_rate = (int)(1.0f / insert_delete_fraction);
     int operation_counter = 0;
     while (passed_time < BENCHMARK_DURATION_SEC) {
-      for (int i = 0; i < MINIMUM_ROUNDS; ++i) {
-        if (operation_counter % swap_rate == 0) {
-          insert_delete(c, *element, idx, result);
-        } else {
-          read_write(c, *element, idx, result);
-        }
-        ++operation_counter;
+      if (operation_counter % swap_rate == 0) {
+        insert_delete(c, idx, result);
+      } else {
+        read_write(c, iterator, idx, result);
       }
+      ++operation_counter;
       passed_time = omp_get_wtime() - start_time;
     }
   }
@@ -168,23 +166,26 @@ main(int argc, char** argv)
 
   if (container_type == "vector") {
     auto vec = std::vector<MyEntry>();
+    auto iterator = vec.begin();
     vec.reserve(n + 10);
     for (int i = 0; i < n; ++i) {
       vec.push_back(*element);
     }
-    std::cout << benchmark(vec, ratio) << std::endl;
+    std::cout << benchmark(vec, ratio, iterator) << std::endl;
   } else if (container_type == "list") {
     auto list = LinkedList<MyEntry>();
+    auto iterator = list.before_begin();
     for (int i = 0; i < n; ++i) {
       list.push_front(*element);
     }
-    std::cout << benchmark(list, ratio) << std::endl;
+    std::cout << benchmark(list, ratio, iterator) << std::endl;
   } else if (container_type == "list_shuffled") {
     auto list = LinkedList<MyEntry>();
+    auto iterator = list.before_begin();
     for (int i = 0; i < n; ++i) {
       list.push_front(*element);
     }
     list.shuffle_list(SEED);
-    std::cout << benchmark(list, ratio) << std::endl;
+    std::cout << benchmark(list, ratio, iterator) << std::endl;
   }
 }

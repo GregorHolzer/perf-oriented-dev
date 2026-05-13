@@ -48,6 +48,9 @@ def parse_output(output: str) -> dict:
     return results
 
 def run_experiment(container: str, elements: int, size: int, fraction: float):
+    if size == 8_000_000 and elements > 1_000:
+        print("Skipped too large size (local limit)")
+        return
     cmd = f"./benchmark {container} {elements} {fraction}"
     if(LCC3):
         cmd = f"srun ./benchmark {container} {elements} {fraction}"
