@@ -3,7 +3,7 @@ import subprocess
 import re
 import csv
 
-containers = ["vector"] #, "list", "list_shuffled"]
+containers = ["vector", "list", "list_shuffled"]
 
 elements = [10, 1000 ,100000, 10000000]
 
