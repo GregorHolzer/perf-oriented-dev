@@ -71,7 +71,9 @@ def run_experiment(container: str, elements: int, size: int, fraction: float):
     output["size"] = size
     output["fraction"] = fraction
 
-    csv_path = CMAKE_DIR / f"{container}.csv"
+    csv_path = CMAKE_DIR / "local" / f"{container}.csv"
+    if(LCC3):
+        csv_path = CMAKE_DIR / "lcc3" / f"{container}.csv"
     file_exists = csv_path.exists()
 
     with open(csv_path, "a", newline="") as f:
