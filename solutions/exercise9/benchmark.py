@@ -71,8 +71,10 @@ def run_experiment(container: str, elements: int, size: int, fraction: float):
     output["size"] = size
     output["fraction"] = fraction
 
+    Path(CMAKE_DIR/"local").mkdir(exist_ok=True, parents=True)
     csv_path = CMAKE_DIR / "local" / f"{container}.csv"
     if(LCC3):
+        Path(CMAKE_DIR/"lcc3").mkdir(exist_ok=True, parents=True)
         csv_path = CMAKE_DIR / "lcc3" / f"{container}.csv"
     file_exists = csv_path.exists()
 
