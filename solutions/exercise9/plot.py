@@ -4,7 +4,7 @@ from matplotlib.lines import Line2D
 import pandas as pd
 import os
 
-LCC3 = False
+LCC3 = True
 file_dir = "./local"
 if LCC3:
     file_dir = "./lcc3"
