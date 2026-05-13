@@ -5,9 +5,9 @@ import csv
 
 containers = ["vector", "list", "list_shuffled"]
 
-elements = [10, 1000 ,100000, 10000000]
+elements = [10, 1_000, 100_000, 1_000_0000]
 
-element_size = [8, 512, 8000000]
+element_size =  [8, 512, 8000000]
 
 instruction_mix = [0.0, 0.01, 0.1, 0.5]
 
@@ -17,7 +17,7 @@ CMAKE_DIR = Path("./")
 
 RUNS = 3
 
-LCC3 = False
+LCC3 = True
 
 def build():
   for size in element_size:
@@ -53,7 +53,7 @@ def run_experiment(container: str, elements: int, size: int, fraction: float):
         return
     cmd = f"./benchmark {container} {elements} {fraction}"
     if(LCC3):
-        cmd = f"srun ./benchmark {container} {elements} {fraction}"
+        cmd = f"srun --mem=20G ./benchmark {container} {elements} {fraction}"
     result = subprocess.run(
         cmd,
         cwd=get_dir(size),
