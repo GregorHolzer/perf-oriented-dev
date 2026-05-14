@@ -27,9 +27,9 @@ sizes            = [8, 512, 8_000_000]
 size_labels      = {8: "8 B", 512: "512 B", 8_000_000: "8 MB"}
 size_tags        = {8: "8", 512: "512", 8_000_000: "8M"}
 
-fractions        = [0.0, 0.1, 0.5]
-fraction_labels  = {0.0: "r=0.0  (read-only)", 0.1: "r=0.1  (10% writes)", 0.5: "r=0.5  (50% writes)"}
-fraction_markers = {0.0: "o", 0.1: "s", 0.5: "^"}
+fractions        = [0.0, 0.01, 0.1, 0.5]
+fraction_labels  = {0.0: "0% ins/del",0.01: "1% ins/del", 0.1: "10% ins/del", 0.5: "50% ins/del"}
+fraction_markers = {0.0: "o", 0.01: "*", 0.1: "s", 0.5: "^"}
 
 colors  = {"Vector": "#2196F3", "List": "#FF5722", "List (shuffled)": "#4CAF50"}
 markers = {"Vector": "o",       "List": "s",       "List (shuffled)": "^"}
@@ -73,7 +73,7 @@ if LCC3:
     title = "LCC3"
 
 # ── FILE 1: 3×3 (rows=sizes, cols=fractions) ──────────────────────────────────
-fig, axes = plt.subplots(3, 3, figsize=(15, 12), sharey=False)
+fig, axes = plt.subplots(3, 4, figsize=(15, 12), sharey=False)
 fig.suptitle(f"{title}", fontsize=14, fontweight="bold")
 
 for row, size in enumerate(sizes):
@@ -117,7 +117,7 @@ for label, _ in datasets:
     for frac in fractions:
         handles.append(Line2D([0], [0], marker=fraction_markers[frac], color=colors[label],
                                linestyle="None", markersize=7,
-                               label=f"{label}  r={frac}"))
+                               label=f"{label} {frac*100}% ins/del"))
 fig.legend(handles=handles, loc="lower center", ncol=len(datasets),
            fontsize=8, bbox_to_anchor=(0.5, -0.18), frameon=True)
 fig.tight_layout()
@@ -126,12 +126,35 @@ plt.close(fig)
 print("Saved bench_1x3.png")
 
 
-# ── FILES 3–5: one per element size, 1×3 subplots (one per fraction) ──────────
+# ── FILES 3–5: one per element size, 1×3 subplots (one per container) ──────────
 for size in sizes:
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharey=False)
+    fig, axes = plt.subplots(1, len(datasets), figsize=(15, 5), sharey=False)
     fig.suptitle(f"{title} — Element size: {size_labels[size]}",
                  fontsize=14, fontweight="bold", y=1.01)
 
+    for ax, (label, df) in zip(axes, datasets):
+        for frac in fractions:
+            sub = df[(df["size"] == size) & (df["fraction"] == frac)].sort_values("elements")
+            ax.scatter(sub["elements"], sub["total_ops"],
+                       color=colors[label], marker=fraction_markers[frac],
+                       s=60, zorder=3, label=fraction_labels[frac])
+            ax.plot(sub["elements"], sub["total_ops"],
+                    color=colors[label], alpha=0.25, linewidth=1)
+        style_ax(ax, size)
+        ax.set_title(label, fontsize=10)
+        ax.legend(fontsize=8)
+
+    fig.tight_layout()
+    fig.savefig(f"./plots/{title.lower()}_bench_size_container_{size_tags[size]}.png",
+                dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Saved bench_size_container_{size_tags[size]}.png")
+
+    # ── FILES 3–5: one per element size, 1×3 subplots (one per fraction) ──────────
+for size in sizes:
+    fig, axes = plt.subplots(1, 4, figsize=(15, 5), sharey=False)
+    fig.suptitle(f"{title} — Element size: {size_labels[size]}",
+    fontsize=14, fontweight="bold", y=1.01)
     for ax, frac in zip(axes, fractions):
         for label, df in datasets:
             sub = df[(df["size"] == size) & (df["fraction"] == frac)].sort_values("elements")
@@ -139,8 +162,9 @@ for size in sizes:
         style_ax(ax, size)
         ax.set_title(fraction_labels[frac], fontsize=10)
         ax.legend(fontsize=8)
-
     fig.tight_layout()
-    fig.savefig(f"./plots/{title.lower()}_bench_size_{size_tags[size]}.png", dpi=150, bbox_inches="tight")
+    fig.savefig(f"./plots/{title.lower()}_bench_size_fraction_{size_tags[size]}.png", dpi=150, bbox_inches="tight")
     plt.close(fig)
-    print(f"Saved bench_size_{size_tags[size]}.png")
+    print(f"Saved bench_size_fraction_{size_tags[size]}.png")
+
+
