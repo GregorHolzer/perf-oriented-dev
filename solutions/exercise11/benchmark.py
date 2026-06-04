@@ -73,7 +73,7 @@ for rep in range(reps):
             exe = posixpath.join(build_dir, "delannoy")
             try:
                 proc = subprocess.run(
-                    ["/usr/bin/time", "-v", exe, str(n)],
+                    ["srun", "/usr/bin/time", "-v", exe, str(n)],
                     capture_output=True, text=True, timeout=60
                 )
                 metrics = parse_time_output(proc.stderr)
