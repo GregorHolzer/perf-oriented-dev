@@ -4,80 +4,52 @@ import re
 import os
 import posixpath
 
-def parse_time_output(stderr: str) -> dict:
-    metrics = {}
+def parse_time_ms(stdout: str) -> float | None:
+    m = re.search(r'Time:\s*([\d.]+)\s*ms', stdout)
+    return float(m.group(1)) if m else None
 
-    m = re.search(r'(\d+):(\d+\.\d+)elapsed', stderr)
-    if m:
-        metrics["wall_clock_s"] = float(m.group(1)) * 60 + float(m.group(2))
-    m = re.search(r'Elapsed \(wall clock\) time.*?(\d+):(\d+\.\d+)', stderr)
-    if m:
-        metrics["wall_clock_s"] = float(m.group(1)) * 60 + float(m.group(2))
-
-    m = re.search(r'([\d.]+)user', stderr)
-    if m:
-        metrics["user_cpu_s"] = float(m.group(1))
-    m = re.search(r'User time.*?:\s*([\d.]+)', stderr)
-    if m:
-        metrics["user_cpu_s"] = float(m.group(1))
-
-    m = re.search(r'([\d.]+)system', stderr)
-    if m:
-        metrics["sys_cpu_s"] = float(m.group(1))
-    m = re.search(r'System time.*?:\s*([\d.]+)', stderr)
-    if m:
-        metrics["sys_cpu_s"] = float(m.group(1))
-
-    m = re.search(r'Maximum resident set size \(kbytes\):\s*(\d+)', stderr)
-    if m:
-        metrics["max_rss_kb"] = int(m.group(1))
-
-    return metrics
-
-def build(build_dir, use_cache):
+def build(build_dir, cmake_flags):
     os.makedirs(build_dir, exist_ok=True)
-    cache_flag = "-DUSE_CACHE=ON" if use_cache else "-DUSE_CACHE=OFF"
-    subprocess.run(["cmake", "../..", "-G", "Ninja", cache_flag], cwd=build_dir, check=True)
+    subprocess.run(["cmake", "../..", "-G", "Ninja"] + cmake_flags, cwd=build_dir, check=True)
     subprocess.run(["ninja"], cwd=build_dir, check=True)
 
-def write_to_csv(filename, n, used_cache, metrics):
+def write_to_csv(filename, n, mode, time_ms):
     file_exists = os.path.exists(filename)
     with open(filename, "a", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["n", "cache", "wall_clock_s", "max_rss_kb"])
+        writer = csv.DictWriter(f, fieldnames=["n", "mode", "time_ms"])
         if not file_exists:
             writer.writeheader()
-        writer.writerow({"n": n, "cache": used_cache, "wall_clock_s": metrics["wall_clock_s"], "max_rss_kb": metrics["max_rss_kb"]})
-
-max_n = 15
-
-used_imputs = []
+        writer.writerow({"n": n, "mode": mode, "time_ms": time_ms})
 
 reps = 3
-
-total = reps * max_n
+max_n_rec = 15
+max_n = 22
 
 print("Compiling...")
+build("./build/std",     ["-DUSE_CACHE=OFF", "-DDYNAMIC=OFF"])
+build("./build/cache",   ["-DUSE_CACHE=ON",  "-DDYNAMIC=OFF"])
+build("./build/dynamic", ["-DUSE_CACHE=OFF", "-DDYNAMIC=ON"])
 
-cache_dir = "./build/cache"
-
-no_cache_dir = "./build/no_cache"
-
-build(cache_dir, True)
-
-build(no_cache_dir, False)
+modes = [
+    ("std",     "./build/std",     max_n_rec),
+    ("cache",   "./build/cache",   max_n),
+    ("dynamic", "./build/dynamic", max_n),
+]
 
 for rep in range(reps):
-    for n in range(1, max_n + 1):
-        print(f"--- Running {rep * max_n + n}/{total} ---")
-        for used_cache, build_dir in [(False, no_cache_dir), (True, cache_dir)]:
+    for mode, build_dir, limit in modes:
+        for n in range(1, limit + 1):
             exe = posixpath.join(build_dir, "delannoy")
             try:
                 proc = subprocess.run(
-                    ["srun", "/usr/bin/time", "-v", exe, str(n)],
+                    ["srun", exe, str(n)],
                     capture_output=True, text=True
                 )
-                metrics = parse_time_output(proc.stderr)
-                write_to_csv("results.csv", n, used_cache, metrics)
+                time_ms = parse_time_ms(proc.stdout)
+                if time_ms is not None:
+                    write_to_csv("results.csv", n, mode, time_ms)
+                    print(f"[{mode}] n={n} rep={rep+1} -> {time_ms:.3f} ms")
+                else:
+                    print(f"[{mode}] n={n} rep={rep+1} -> parse failed: {proc.stdout!r}")
             except subprocess.TimeoutExpired:
-                print(f"Timeout: n={n}, cache={used_cache}")
-
+                print(f"Timeout: n={n}, mode={mode}")

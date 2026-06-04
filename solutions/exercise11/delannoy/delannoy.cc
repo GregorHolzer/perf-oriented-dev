@@ -1,9 +1,11 @@
 #include <cstdint>
+#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 typedef unsigned long dn;
 
@@ -61,6 +63,21 @@ delannoy(dn x, dn y, std::unordered_map<uint64_t, dn>& map) -> dn
   return result;
 }
 
+auto
+delannoy_dynamic(dn x, dn y) -> dn
+{
+  auto src = std::vector<dn>(y + 1, 1);
+  auto dst = std::vector<dn>(y + 1, 1);
+
+  for (dn i = 1; i <= x; ++i) {
+    for (dn j = 1; j <= y; ++j) {
+      dst[j] = dst[j - 1] + src[j - 1] + src[j];
+    }
+    std::swap(src, dst);
+  }
+  return src[y];
+}
+
 dn DELANNOY_RESULTS[] = { 1,
                           3,
                           13,
@@ -103,15 +120,22 @@ main(int argc, char** argv)
 
   dn result = 0;
 
+  double start = omp_get_wtime();
+
 #ifdef USE_CACHE
   auto map = std::unordered_map<uint64_t, dn>{};
   result = delannoy(n, n, map);
+#elif defined(DYNAMIC)
+  result = delannoy_dynamic(n, n);
 #else
   result = delannoy(n, n);
 #endif
 
+  double end = omp_get_wtime();
+
   if (result == DELANNOY_RESULTS[n]) {
     printf("Verification: OK\n");
+    printf("Time: %f ms\n", (end - start) * 1000);
     return EXIT_SUCCESS;
   }
   printf("Verification: ERR\n");
