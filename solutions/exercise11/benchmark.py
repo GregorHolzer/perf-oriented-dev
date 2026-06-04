@@ -74,7 +74,7 @@ for rep in range(reps):
             try:
                 proc = subprocess.run(
                     ["srun", "/usr/bin/time", "-v", exe, str(n)],
-                    capture_output=True, text=True, timeout=60
+                    capture_output=True, text=True
                 )
                 metrics = parse_time_output(proc.stderr)
                 write_to_csv("results.csv", n, used_cache, metrics)
