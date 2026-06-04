@@ -122,7 +122,7 @@ benchmark(Container<T>& c, float insert_delete_fraction, I& iterator)
   auto result = BenchmarkResult();
   auto start_time = omp_get_wtime();
   auto passed_time = omp_get_wtime() - start_time;
-  auto element = std::make_unique<T>(*(c.begin()));
+  auto element = std::make_unique<T>();
   if (insert_delete_fraction == 0.0f) {
     while (passed_time < BENCHMARK_DURATION_SEC) {
       read_write(c, iterator, idx, result);
