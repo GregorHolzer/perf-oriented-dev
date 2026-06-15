@@ -1,4 +1,0 @@
-run,func,iterations,n,time_s,result
-0,fibonacci_naive,100,30,9.5319,832040
-0,fibonacci_tail,10000000,30,6.8557,832040
-0,fibonacci_iter,25000000,30,4.8797,832040
