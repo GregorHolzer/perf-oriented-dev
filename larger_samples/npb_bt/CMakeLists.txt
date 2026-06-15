@@ -13,8 +13,8 @@ endif()
 #add_link_options(-pg)
 
 # tracy
-#option(TRACY_ENABLE "" ON)
-#add_subdirectory(${CMAKE_SOURCE_DIR}/../../third_party/tracy tracy)
+option(TRACY_ENABLE "" ON)
+add_subdirectory(${CMAKE_SOURCE_DIR}/../../third_party/tracy tracy)
 
 # massif
 #add_compile_options(-g)
@@ -25,7 +25,7 @@ link_libraries(m)
 
 add_executable(npb_bt_w ${SOURCE_FILES})
 target_include_directories(npb_bt_w PRIVATE src/w)
-#target_link_libraries(npb_bt_w PUBLIC Tracy::TracyClient)
+target_link_libraries(npb_bt_w PUBLIC Tracy::TracyClient)
 
 add_executable(npb_bt_s ${SOURCE_FILES})
 target_include_directories(npb_bt_s PRIVATE src/s)
